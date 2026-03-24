@@ -21,15 +21,18 @@ pub struct Aequa {
 }
 
 impl Aequa {
+    #[must_use] 
     pub const fn new(value: i128, scale: u32) -> Self {
         Self { value, scale }
     }
 
+    #[must_use] 
     pub fn scale(&self) -> u32 {
         self.scale
     }
 
     /// Trims trailing zeros from the decimal part to simplify the scale.
+    #[must_use] 
     pub fn trim_scale(mut self) -> Self {
         while self.scale > 0 && self.value % 10 == 0 {
             self.value /= 10;
@@ -43,9 +46,10 @@ impl Aequa {
     /// The array containes first the value, then the scale. Both are LEB-128 encoded.
     ///
     /// To reconstruct the Aequa from the byte array, use `Aequa::from_bytes`.
+    #[must_use] 
     pub fn to_bytes(self) -> Vec<u8> {
         let value_leb = serialize_leb128_signed(self.value);
-        let scale_leb = serialize_leb128_unsigned(self.scale as u128);
+        let scale_leb = serialize_leb128_unsigned(u128::from(self.scale));
 
         [value_leb, scale_leb].concat()
     }
@@ -64,7 +68,7 @@ impl Aequa {
             Ok(v) => v,
             Err(_) => return Err(AequaError::InvalidScale),
         };
-        let total_bytes: u16 = (bytes_read + s_bytes_read) as u16;
+        let total_bytes: u16 = u16::from(bytes_read + s_bytes_read);
         Ok((Aequa::new(value, scale as u32), total_bytes))
     }
 }
@@ -120,7 +124,7 @@ impl Display for Aequa {
         let sign = if trimmed.value < 0 { "-" } else { "" };
 
         if trimmed.scale == 0 {
-            write!(f, "{}{}", sign, s)
+            write!(f, "{sign}{s}")
         } else if trimmed.scale < s.len() as u32 {
             let dot_pos = s.len() - trimmed.scale as usize;
             write!(f, "{}{}.{}", sign, &s[..dot_pos], &s[dot_pos..])
