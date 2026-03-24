@@ -12,7 +12,7 @@ fn main() {
     let b: f64 = 0.1.into();
     let res = a * b;
     println!("0.1 * 0.1 = {:?}", res);
-    
+
     // Test 3: High Precision String (Bypass f64 16-digit limit)
     // 30 decimal places
     let hp_str = "0.123456789012345678901234567890";
