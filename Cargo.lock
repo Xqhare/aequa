@@ -11,8 +11,8 @@ dependencies = [
 
 [[package]]
 name = "athena"
-version = "1.2.0"
-source = "git+https://github.com/xqhare/athena#b35e7c34215ace0ce8e42991b3975c38dbcb62d8"
+version = "1.3.0"
+source = "git+https://github.com/xqhare/athena#c86940d8921a8d9f34205ea27377ab12e502dbae"
 dependencies = [
  "libc",
 ]
