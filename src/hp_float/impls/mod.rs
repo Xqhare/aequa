@@ -89,16 +89,23 @@ pub struct HpFloat {
     scale: u32,
 }
 
+<<<<<<< HEAD:src/hp_float/impls/mod.rs
 impl HpFloat {
+=======
+impl Aequa {
+    #[must_use]
+>>>>>>> e8db0d4a65d20248992c924618248eb3ad966b21:src/impls/mod.rs
     pub const fn new(value: i128, scale: u32) -> Self {
         Self { value, scale }
     }
 
+    #[must_use]
     pub fn scale(&self) -> u32 {
         self.scale
     }
 
     /// Trims trailing zeros from the decimal part to simplify the scale.
+    #[must_use]
     pub fn trim_scale(mut self) -> Self {
         while self.scale > 0 && self.value % 10 == 0 {
             self.value /= 10;
@@ -106,6 +113,40 @@ impl HpFloat {
         }
         self
     }
+<<<<<<< HEAD:src/hp_float/impls/mod.rs
+=======
+
+    /// Converts Aequa to a byte array.
+    ///
+    /// The array containes first the value, then the scale. Both are LEB-128 encoded.
+    ///
+    /// To reconstruct the Aequa from the byte array, use `Aequa::from_bytes`.
+    #[must_use]
+    pub fn to_bytes(self) -> Vec<u8> {
+        let value_leb = serialize_leb128_signed(self.value);
+        let scale_leb = serialize_leb128_unsigned(u128::from(self.scale));
+
+        [value_leb, scale_leb].concat()
+    }
+
+    /// Reconstructs an Aequa from a byte array.
+    ///
+    /// The byte array contains first the value, then the scale. Both are LEB-128 encoded.
+    /// Returns the Aequa and the number of bytes read.
+    pub fn from_bytes(bytes: &[u8]) -> Result<(Self, u16), AequaError> {
+        let (value, bytes_read) = match deserialize_leb128_signed(&bytes[0..]) {
+            Ok(v) => v,
+            Err(_) => return Err(AequaError::InvalidValue),
+        };
+        let (scale, s_bytes_read) = match deserialize_leb128_unsigned(&bytes[bytes_read as usize..])
+        {
+            Ok(v) => v,
+            Err(_) => return Err(AequaError::InvalidScale),
+        };
+        let total_bytes: u16 = u16::from(bytes_read + s_bytes_read);
+        Ok((Aequa::new(value, scale as u32), total_bytes))
+    }
+>>>>>>> e8db0d4a65d20248992c924618248eb3ad966b21:src/impls/mod.rs
 }
 
 impl From<std::primitive::f64> for HpFloat {
@@ -159,7 +200,7 @@ impl Display for HpFloat {
         let sign = if trimmed.value < 0 { "-" } else { "" };
 
         if trimmed.scale == 0 {
-            write!(f, "{}{}", sign, s)
+            write!(f, "{sign}{s}")
         } else if trimmed.scale < s.len() as u32 {
             let dot_pos = s.len() - trimmed.scale as usize;
             write!(f, "{}{}.{}", sign, &s[..dot_pos], &s[dot_pos..])

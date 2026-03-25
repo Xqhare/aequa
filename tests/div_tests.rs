@@ -12,8 +12,8 @@ fn test_div_precision() {
 #[test]
 fn test_div_underflow_no_panic() {
     let a: f64 = 10.0.into(); // scale 0
-    let b: f64 = 0.1.into();  // scale 1
-    let res = (a / b).trim_scale(); 
+    let b: f64 = 0.1.into(); // scale 1
+    let res = (a / b).trim_scale();
     // 10 / 0.1 = 100
     assert_eq!(res.to_string(), "100");
 }
