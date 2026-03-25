@@ -89,19 +89,11 @@ pub struct HpFloat {
     scale: u32,
 }
 
-<<<<<<< HEAD:src/hp_float/impls/mod.rs
 impl HpFloat {
-=======
-impl Aequa {
+    /// Creates a new `HpFloat` with the given value and scale
     #[must_use]
->>>>>>> e8db0d4a65d20248992c924618248eb3ad966b21:src/impls/mod.rs
     pub const fn new(value: i128, scale: u32) -> Self {
         Self { value, scale }
-    }
-
-    #[must_use]
-    pub fn scale(&self) -> u32 {
-        self.scale
     }
 
     /// Trims trailing zeros from the decimal part to simplify the scale.
@@ -113,40 +105,22 @@ impl Aequa {
         }
         self
     }
-<<<<<<< HEAD:src/hp_float/impls/mod.rs
-=======
 
-    /// Converts Aequa to a byte array.
+    /// Returns the value of the number
     ///
-    /// The array containes first the value, then the scale. Both are LEB-128 encoded.
-    ///
-    /// To reconstruct the Aequa from the byte array, use `Aequa::from_bytes`.
-    #[must_use]
-    pub fn to_bytes(self) -> Vec<u8> {
-        let value_leb = serialize_leb128_signed(self.value);
-        let scale_leb = serialize_leb128_unsigned(u128::from(self.scale));
-
-        [value_leb, scale_leb].concat()
+    /// Usefull for custom serialization
+    /// Use `get_scale()` to get the scale
+    pub fn get_value(&self) -> i128 {
+        self.value
     }
 
-    /// Reconstructs an Aequa from a byte array.
+    /// Returns the scale of the number
     ///
-    /// The byte array contains first the value, then the scale. Both are LEB-128 encoded.
-    /// Returns the Aequa and the number of bytes read.
-    pub fn from_bytes(bytes: &[u8]) -> Result<(Self, u16), AequaError> {
-        let (value, bytes_read) = match deserialize_leb128_signed(&bytes[0..]) {
-            Ok(v) => v,
-            Err(_) => return Err(AequaError::InvalidValue),
-        };
-        let (scale, s_bytes_read) = match deserialize_leb128_unsigned(&bytes[bytes_read as usize..])
-        {
-            Ok(v) => v,
-            Err(_) => return Err(AequaError::InvalidScale),
-        };
-        let total_bytes: u16 = u16::from(bytes_read + s_bytes_read);
-        Ok((Aequa::new(value, scale as u32), total_bytes))
+    /// Usefull for custom serialization
+    /// Use `get_value()` to get the value
+    pub fn get_scale(&self) -> u32 {
+        self.scale
     }
->>>>>>> e8db0d4a65d20248992c924618248eb3ad966b21:src/impls/mod.rs
 }
 
 impl From<std::primitive::f64> for HpFloat {

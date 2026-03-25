@@ -18,5 +18,5 @@ fn main() {
     let hp_str = "0.123456789012345678901234567890";
     let hp: f64 = f64::from_str(hp_str).unwrap();
     println!("High Precision String (30 digits): {:?}", hp);
-    assert_eq!(hp.scale(), 30);
+    assert_eq!(hp.get_scale(), 30);
 }
