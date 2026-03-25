@@ -1,26 +1,95 @@
 use std::fmt::Display;
 
-use athena::encoding_and_decoding::{
-    deserialize_leb128_signed, deserialize_leb128_unsigned, serialize_leb128_signed,
-    serialize_leb128_unsigned,
-};
-
-use crate::AequaError;
-
 pub mod maths;
-/// Aequa represents a number with arbitrary precision.
+/// A number with arbitrary precision.
 ///
-/// It follows the principle that "exact exchange and accurate weights"
-/// should be the default for financial or scientific calculations.
+/// It trades off speed for precision, and is intended to be used as a drop in replacement for both `f64` and `f32`.
+///
+/// It follows my "no dependencies but the standard library and libc" philosophy.
+///
+/// ## Features
+///
+/// - Arbitrary precision
+/// - Fast
+/// - No dependencies
+/// - Drop-in replacement for `f64` and `f32`
+///
+/// ## Usage
+///
+/// ### Importing
+///
+/// Add the following to your `Cargo.toml`:
+///
+/// ```toml
+/// [dependencies]
+/// aequa = { git = "https://github.com/xqhare/aequa" }
+/// ```
+///
+/// ### In Your Code
+///
+/// Simply shadow the primitive type to use `Aequa` throughout your module with full precision.
+///
+/// ```rust
+/// use aequa::f64; // Shadows primitive f64 locally
+///
+/// let a: f64 = 0.1.into();
+/// let b: f64 = 0.2.into();
+///
+/// // Standard operators work seamlessly
+/// let sum = a + b;
+///
+/// // Even mixing with literals is supported
+/// let result = sum + 0.4;
+///
+/// assert_eq!(result, 0.7.into());
+/// ```
+///
+/// ## How It Works
+///
+/// The idea is really quite simple.
+///
+/// Let's take the infamous example of 0.1 + 0.2:
+///
+/// If done using IEEE floats: 0.1 + 0.2 = 0.30000000000000004
+///
+/// If done using Aequa: 0.1 + 0.2 = 0.3
+///
+/// ### Examples
+///
+/// 0.1 => (1 * 10^-1) => 1 | 1
+/// 0.2 => (2 * 10^-1) => 2 | 1
+/// 0.1 + 0.2 => 3(3 * 10^-1) => 3 | 1
+///
+/// 1.2 + 0.004 = 1.204
+/// 1.2 => (12 * 10^-1) => 12 | 1
+/// 0.004 => (4 * 10^-3) => 4 | 3
+///
+/// To add, you align the scales by multiplying the value of the smaller scale by 10^(scale_diff):
+///
+/// scale_diff = 3 - 1 = 2
+/// 1.2 => (12 * 10^2) | 1 = 1200 | 1
+///
+/// Then add the values together:
+/// 1200 | 1 + 4 | 3 = 1204 | 3
+///
+/// To go backwards:
+///
+/// 1. Take the value as a string: "1204"
+/// 2. Insert the decimal point 3 places from the right: "1.204"
+///
+/// If the value is smaller than the scale (e.g., 3 | 1):
+///
+/// 1. Pad the string with leading zeros: "03"
+/// 2. Insert the decimal point: "0.3"
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Aequa {
+pub struct HpFloat {
     /// The integer representation of the number (e.g., 1204 for 1.204)
     value: i128,
     /// The power of 10 applied to the value (e.g., 3 for 10^-3)
     scale: u32,
 }
 
-impl Aequa {
+impl HpFloat {
     pub const fn new(value: i128, scale: u32) -> Self {
         Self { value, scale }
     }
@@ -37,39 +106,9 @@ impl Aequa {
         }
         self
     }
-
-    /// Converts Aequa to a byte array.
-    ///
-    /// The array containes first the value, then the scale. Both are LEB-128 encoded.
-    ///
-    /// To reconstruct the Aequa from the byte array, use `Aequa::from_bytes`.
-    pub fn to_bytes(self) -> Vec<u8> {
-        let value_leb = serialize_leb128_signed(self.value);
-        let scale_leb = serialize_leb128_unsigned(self.scale as u128);
-
-        [value_leb, scale_leb].concat()
-    }
-
-    /// Reconstructs an Aequa from a byte array.
-    ///
-    /// The byte array contains first the value, then the scale. Both are LEB-128 encoded.
-    /// Returns the Aequa and the number of bytes read.
-    pub fn from_bytes(bytes: &[u8]) -> Result<(Self, u16), AequaError> {
-        let (value, bytes_read) = match deserialize_leb128_signed(&bytes[0..]) {
-            Ok(v) => v,
-            Err(_) => return Err(AequaError::InvalidValue),
-        };
-        let (scale, s_bytes_read) = match deserialize_leb128_unsigned(&bytes[bytes_read as usize..])
-        {
-            Ok(v) => v,
-            Err(_) => return Err(AequaError::InvalidScale),
-        };
-        let total_bytes: u16 = (bytes_read + s_bytes_read) as u16;
-        Ok((Aequa::new(value, scale as u32), total_bytes))
-    }
 }
 
-impl From<std::primitive::f64> for Aequa {
+impl From<std::primitive::f64> for HpFloat {
     fn from(f: std::primitive::f64) -> Self {
         // Rust's to_string() uses the Ryu algorithm to find the shortest
         // decimal representation that rounds back to the same float.
@@ -78,13 +117,13 @@ impl From<std::primitive::f64> for Aequa {
     }
 }
 
-impl From<std::primitive::f32> for Aequa {
+impl From<std::primitive::f32> for HpFloat {
     fn from(f: std::primitive::f32) -> Self {
         f.to_string().parse().unwrap_or(Self::new(0, 0))
     }
 }
 
-impl std::str::FromStr for Aequa {
+impl std::str::FromStr for HpFloat {
     type Err = std::num::ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -95,7 +134,7 @@ impl std::str::FromStr for Aequa {
             // For now, let's fall back to f64 for scientific notation parsing
             // or we could implement a custom parser later.
             return Ok(std::primitive::f64::from_str(s)
-                .map(Aequa::from)
+                .map(HpFloat::from)
                 .unwrap_or(Self::new(0, 0)));
         }
 
@@ -113,7 +152,7 @@ impl std::str::FromStr for Aequa {
     }
 }
 
-impl Display for Aequa {
+impl Display for HpFloat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let trimmed = self.trim_scale();
         let s = trimmed.value.abs().to_string();

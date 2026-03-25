@@ -1,8 +1,8 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-use crate::Aequa;
+use crate::HpFloat;
 
-impl Mul for Aequa {
+impl Mul for HpFloat {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -10,39 +10,39 @@ impl Mul for Aequa {
     }
 }
 
-impl Mul<std::primitive::f64> for Aequa {
+impl Mul<std::primitive::f64> for HpFloat {
     type Output = Self;
 
     fn mul(self, rhs: std::primitive::f64) -> Self::Output {
-        self * Aequa::from(rhs)
+        self * HpFloat::from(rhs)
     }
 }
 
-impl Mul<std::primitive::f32> for Aequa {
+impl Mul<std::primitive::f32> for HpFloat {
     type Output = Self;
 
     fn mul(self, rhs: std::primitive::f32) -> Self::Output {
-        self * Aequa::from(rhs)
+        self * HpFloat::from(rhs)
     }
 }
 
-impl Mul<Aequa> for std::primitive::f64 {
-    type Output = Aequa;
+impl Mul<HpFloat> for std::primitive::f64 {
+    type Output = HpFloat;
 
-    fn mul(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) * rhs
+    fn mul(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) * rhs
     }
 }
 
-impl Mul<Aequa> for std::primitive::f32 {
-    type Output = Aequa;
+impl Mul<HpFloat> for std::primitive::f32 {
+    type Output = HpFloat;
 
-    fn mul(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) * rhs
+    fn mul(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) * rhs
     }
 }
 
-impl Div for Aequa {
+impl Div for HpFloat {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -68,39 +68,39 @@ impl Div for Aequa {
     }
 }
 
-impl Div<std::primitive::f64> for Aequa {
+impl Div<std::primitive::f64> for HpFloat {
     type Output = Self;
 
     fn div(self, rhs: std::primitive::f64) -> Self::Output {
-        self / Aequa::from(rhs)
+        self / HpFloat::from(rhs)
     }
 }
 
-impl Div<std::primitive::f32> for Aequa {
+impl Div<std::primitive::f32> for HpFloat {
     type Output = Self;
 
     fn div(self, rhs: std::primitive::f32) -> Self::Output {
-        self / Aequa::from(rhs)
+        self / HpFloat::from(rhs)
     }
 }
 
-impl Div<Aequa> for std::primitive::f64 {
-    type Output = Aequa;
+impl Div<HpFloat> for std::primitive::f64 {
+    type Output = HpFloat;
 
-    fn div(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) / rhs
+    fn div(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) / rhs
     }
 }
 
-impl Div<Aequa> for std::primitive::f32 {
-    type Output = Aequa;
+impl Div<HpFloat> for std::primitive::f32 {
+    type Output = HpFloat;
 
-    fn div(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) / rhs
+    fn div(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) / rhs
     }
 }
 
-impl Add for Aequa {
+impl Add for HpFloat {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -119,39 +119,39 @@ impl Add for Aequa {
     }
 }
 
-impl Add<std::primitive::f64> for Aequa {
+impl Add<std::primitive::f64> for HpFloat {
     type Output = Self;
 
     fn add(self, rhs: std::primitive::f64) -> Self::Output {
-        self + Aequa::from(rhs)
+        self + HpFloat::from(rhs)
     }
 }
 
-impl Add<std::primitive::f32> for Aequa {
+impl Add<std::primitive::f32> for HpFloat {
     type Output = Self;
 
     fn add(self, rhs: std::primitive::f32) -> Self::Output {
-        self + Aequa::from(rhs)
+        self + HpFloat::from(rhs)
     }
 }
 
-impl Add<Aequa> for std::primitive::f64 {
-    type Output = Aequa;
+impl Add<HpFloat> for std::primitive::f64 {
+    type Output = HpFloat;
 
-    fn add(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) + rhs
+    fn add(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) + rhs
     }
 }
 
-impl Add<Aequa> for std::primitive::f32 {
-    type Output = Aequa;
+impl Add<HpFloat> for std::primitive::f32 {
+    type Output = HpFloat;
 
-    fn add(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) + rhs
+    fn add(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) + rhs
     }
 }
 
-impl Sub for Aequa {
+impl Sub for HpFloat {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -170,39 +170,39 @@ impl Sub for Aequa {
     }
 }
 
-impl Sub<std::primitive::f64> for Aequa {
+impl Sub<std::primitive::f64> for HpFloat {
     type Output = Self;
 
     fn sub(self, rhs: std::primitive::f64) -> Self::Output {
-        self - Aequa::from(rhs)
+        self - HpFloat::from(rhs)
     }
 }
 
-impl Sub<std::primitive::f32> for Aequa {
+impl Sub<std::primitive::f32> for HpFloat {
     type Output = Self;
 
     fn sub(self, rhs: std::primitive::f32) -> Self::Output {
-        self - Aequa::from(rhs)
+        self - HpFloat::from(rhs)
     }
 }
 
-impl Sub<Aequa> for std::primitive::f64 {
-    type Output = Aequa;
+impl Sub<HpFloat> for std::primitive::f64 {
+    type Output = HpFloat;
 
-    fn sub(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) - rhs
+    fn sub(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) - rhs
     }
 }
 
-impl Sub<Aequa> for std::primitive::f32 {
-    type Output = Aequa;
+impl Sub<HpFloat> for std::primitive::f32 {
+    type Output = HpFloat;
 
-    fn sub(self, rhs: Aequa) -> Self::Output {
-        Aequa::from(self) - rhs
+    fn sub(self, rhs: HpFloat) -> Self::Output {
+        HpFloat::from(self) - rhs
     }
 }
 
-impl Neg for Aequa {
+impl Neg for HpFloat {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
