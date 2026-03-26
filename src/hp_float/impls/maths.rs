@@ -1,6 +1,6 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-use crate::HpFloat;
+use crate::hp_float::HpFloat;
 
 impl Mul for HpFloat {
     type Output = Self;

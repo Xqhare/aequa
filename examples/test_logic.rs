@@ -1,4 +1,4 @@
-use aequa::f64;
+use aequa::hp_float::f64;
 use std::str::FromStr;
 
 fn main() {

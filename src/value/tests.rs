@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-use crate::{Array, Data, Number, Object, XffValue};
+use crate::value::{Array, Data, Number, Object, XffValue};
 
 #[test]
 fn general() {
@@ -139,7 +139,6 @@ fn test_array_into_iter() {
 
 #[test]
 fn test_v3_variants() {
-
     use crate::value::table::Table;
     use crate::value::uuid::Uuid;
 
@@ -267,7 +266,7 @@ fn time_interop() {
 
 #[test]
 fn test_object_parity() {
-    use crate::{Object, OrderedObject};
+    use crate::value::{Object, OrderedObject};
 
     // Manual test for Object
     let mut obj = Object::new();

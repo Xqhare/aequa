@@ -1,8 +1,8 @@
-use aequa::*;
+use aequa::hp_float::{PI, f64};
 
 #[test]
 fn test_pi() {
-    let pi = aequa::PI;
+    let pi = PI;
     // Should be 3.1415926535...
     assert!(pi.to_string().starts_with("3.1415926535"));
 }

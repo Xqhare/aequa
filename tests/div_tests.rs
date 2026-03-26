@@ -1,4 +1,4 @@
-use aequa::f64;
+use aequa::hp_float::f64;
 
 #[test]
 fn test_div_precision() {

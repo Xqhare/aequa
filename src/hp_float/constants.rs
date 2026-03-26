@@ -1,4 +1,4 @@
-use crate::HpFloat;
+use crate::hp_float::HpFloat;
 
 /// The Archimedes' constant (π). 32 digits of precision.
 pub const PI: HpFloat = HpFloat::new(31415926535897932384626433832795, 31);

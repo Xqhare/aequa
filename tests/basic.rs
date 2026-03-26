@@ -1,4 +1,4 @@
-use aequa::*;
+use aequa::hp_float::f64;
 
 #[test]
 fn test_basic_addition() {
