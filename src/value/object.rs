@@ -99,7 +99,7 @@ pub struct Object {
 
 impl Object {
     /// Creates an empty object
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Object {
             map: BTreeMap::new(),
@@ -122,7 +122,7 @@ impl Object {
     ///
     /// let map: BTreeMap<String, XffValue> = xff_obj_value.into_btree_map();
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn into_btree_map(self) -> BTreeMap<String, XffValue> {
         self.map
     }
@@ -144,7 +144,7 @@ impl Object {
     /// let map: HashMap<String, XffValue> = xff_obj_value.into_hash_map();
     /// assert_eq!(map.len(), 2);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn into_hash_map(self) -> HashMap<String, XffValue> {
         self.map.into_iter().collect::<HashMap<String, XffValue>>()
     }
@@ -166,7 +166,7 @@ impl Object {
     ///
     /// assert!(xff_obj_value.is_empty());
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
@@ -253,7 +253,7 @@ impl Object {
     /// assert_eq!(xff_obj_value.get("keyB"), Some(&XffValue::from(42.69)));
     /// assert_eq!(xff_obj_value.get("keyC"), None);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, key: &str) -> Option<&XffValue> {
         self.map.get(key)
     }
@@ -276,7 +276,7 @@ impl Object {
     ///
     /// assert_eq!(xff_obj_value.len(), 2);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.map.len()
     }
@@ -295,7 +295,7 @@ impl Object {
     /// assert!(xff_obj_value.contains_key("keyA"));
     /// assert!(!xff_obj_value.contains_key("keyC"));
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn contains_key(&self, key: &str) -> bool {
         self.map.contains_key(key)
     }

@@ -110,7 +110,7 @@ impl HpFloat {
     ///
     /// Usefull for custom serialization
     /// Use `get_scale()` to get the scale
-    #[must_use] 
+    #[must_use]
     pub fn get_value(&self) -> i128 {
         self.value
     }
@@ -119,7 +119,7 @@ impl HpFloat {
     ///
     /// Usefull for custom serialization
     /// Use `get_value()` to get the value
-    #[must_use] 
+    #[must_use]
     pub fn get_scale(&self) -> u32 {
         self.scale
     }

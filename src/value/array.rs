@@ -69,7 +69,7 @@ pub struct Array {
 
 impl Array {
     /// Creates a new and empty `Array`
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Array { values: Vec::new() }
     }
@@ -93,7 +93,7 @@ impl Array {
     ///     XffValue::from(42.69),
     /// ]);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn into_vec(&self) -> Vec<XffValue> {
         self.values.clone()
     }
@@ -112,7 +112,7 @@ impl Array {
     ///
     /// assert_eq!(array.len(), 3);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.values.len()
     }
@@ -127,7 +127,7 @@ impl Array {
     ///
     /// assert!(array.is_empty());
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.values.is_empty()
     }
@@ -251,7 +251,7 @@ impl Array {
     /// let value = array.get(1);
     /// assert_eq!(value, Some(&XffValue::from(42.69)));
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, index: usize) -> Option<&XffValue> {
         self.values.get(index)
     }
@@ -278,7 +278,7 @@ impl Array {
     /// let value = array.contains(&XffValue::from(42.69));
     /// assert_eq!(value, true);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn contains(&self, value: &XffValue) -> bool {
         self.values.contains(value)
     }

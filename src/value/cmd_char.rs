@@ -86,7 +86,7 @@ pub enum CommandCharacter {
 impl CommandCharacter {
     /// Takes in a u8 and returns the corresponding command character
     /// If no valid command character is found, returns `CommandCharacter::Null`
-    #[must_use] 
+    #[must_use]
     pub fn from_u8(c: u8) -> Self {
         match c {
             0 => CommandCharacter::Null,
@@ -131,7 +131,7 @@ impl CommandCharacter {
     }
     /// Takes in a u8 and returns the corresponding command character
     /// If no valid command character is found, returns `none`
-    #[must_use] 
+    #[must_use]
     pub fn from_u8_checked(c: u8) -> Option<Self> {
         match c {
             0 => Some(CommandCharacter::Null),
@@ -174,7 +174,7 @@ impl CommandCharacter {
         }
     }
     /// Returns the command character as bytes in ASCII form
-    #[must_use] 
+    #[must_use]
     pub fn as_u8(&self) -> u8 {
         match self {
             CommandCharacter::Null => 0,

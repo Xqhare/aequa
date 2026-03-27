@@ -2,7 +2,7 @@ use super::{Object, XffValue};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 /// A metadata object for XFF files.
-/// 
+///
 /// Provides high-level context about the file, such as creator, source, and license.
 pub struct Metadata {
     /// The underlying data storage
@@ -11,7 +11,7 @@ pub struct Metadata {
 
 impl Metadata {
     /// Creates a new, empty Metadata object
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -22,7 +22,7 @@ impl Metadata {
     }
 
     /// Gets the creator of the file
-    #[must_use] 
+    #[must_use]
     pub fn get_creator(&self) -> Option<String> {
         self.map.get("creator")?.into_string()
     }
@@ -33,7 +33,7 @@ impl Metadata {
     }
 
     /// Gets the creation timestamp
-    #[must_use] 
+    #[must_use]
     pub fn get_created_at(&self) -> Option<u64> {
         if let Some(XffValue::DateTime(dt)) = self.map.get("created_at") {
             Some(*dt)
@@ -48,18 +48,19 @@ impl Metadata {
     }
 
     /// Gets the source of the data
-    #[must_use] 
+    #[must_use]
     pub fn get_source(&self) -> Option<String> {
         self.map.get("source")?.into_string()
     }
 
     /// Sets a human-readable summary
     pub fn set_description(&mut self, description: String) {
-        self.map.insert("description", XffValue::String(description));
+        self.map
+            .insert("description", XffValue::String(description));
     }
 
     /// Gets the description
-    #[must_use] 
+    #[must_use]
     pub fn get_description(&self) -> Option<String> {
         self.map.get("description")?.into_string()
     }
@@ -70,13 +71,13 @@ impl Metadata {
     }
 
     /// Gets the license
-    #[must_use] 
+    #[must_use]
     pub fn get_license(&self) -> Option<String> {
         self.map.get("license")?.into_string()
     }
 
     /// Sets an arbitrary metadata key-value pair.
-    /// 
+    ///
     /// To adhere to the XFF v3 standard, metadata should be flat.
     /// Use `is_flat_value()` to check if a value is suitable for metadata.
     pub fn set_custom<S: Into<String>, V: Into<XffValue>>(&mut self, key: S, value: V) {
@@ -84,10 +85,10 @@ impl Metadata {
     }
 
     /// Checks if the metadata adheres to the XFF v3 "no nested parents" requirement.
-    /// 
+    ///
     /// Metadata can contain primitives or a single level of parent types (Array, Object, Table),
     /// but those parent types cannot contain further nested parents.
-    #[must_use] 
+    #[must_use]
     pub fn is_strict_v3_compliant(&self) -> bool {
         self.map.iter().all(|(_, v)| {
             if Self::is_flat_value(v) {
@@ -106,39 +107,39 @@ impl Metadata {
     }
 
     /// Helper to check if a value is a "flat" (primitive/specialized) type.
-    #[must_use] 
+    #[must_use]
     pub fn is_flat_value(value: &XffValue) -> bool {
         match value {
-            XffValue::String(_) |
-            XffValue::Number(_) |
-            XffValue::Boolean(_) |
-            XffValue::DateTime(_) |
-            XffValue::Duration(_) |
-            XffValue::Uuid(_) |
-            XffValue::NaN |
-            XffValue::Infinity |
-            XffValue::NegInfinity |
-            XffValue::Null => true,
-            
+            XffValue::String(_)
+            | XffValue::Number(_)
+            | XffValue::Boolean(_)
+            | XffValue::DateTime(_)
+            | XffValue::Duration(_)
+            | XffValue::Uuid(_)
+            | XffValue::NaN
+            | XffValue::Infinity
+            | XffValue::NegInfinity
+            | XffValue::Null => true,
+
             // Parent types and legacy types are not "flat"
             _ => false,
         }
     }
 
     /// Gets an arbitrary metadata value
-    #[must_use] 
+    #[must_use]
     pub fn get_custom(&self, key: &str) -> Option<&XffValue> {
         self.map.get(key)
     }
 
     /// Returns the number of metadata entries
-    #[must_use] 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.map.len()
     }
 
     /// Returns true if there are no metadata entries
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
