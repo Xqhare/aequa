@@ -13,21 +13,25 @@ pub struct OrderedObject {
 
 impl OrderedObject {
     /// Creates a new, empty ordered object.
+    #[must_use] 
     pub fn new() -> Self {
         Self { pairs: Vec::new() }
     }
 
     /// Creates an ordered object from a vector of pairs.
+    #[must_use] 
     pub fn from_vec(pairs: Vec<(String, XffValue)>) -> Self {
         Self { pairs }
     }
 
     /// Returns the number of elements in the ordered object.
+    #[must_use] 
     pub fn len(&self) -> usize {
         self.pairs.len()
     }
 
     /// Returns `true` if the ordered object is empty.
+    #[must_use] 
     pub fn is_empty(&self) -> bool {
         self.pairs.is_empty()
     }
@@ -70,6 +74,7 @@ impl OrderedObject {
     /// Returns a reference to the value associated with the key, if it exists.
     ///
     /// Note: This is an O(n) operation.
+    #[must_use] 
     pub fn get(&self, key: &str) -> Option<&XffValue> {
         self.pairs.iter().find(|(k, _)| k == key).map(|(_, v)| v)
     }
@@ -82,11 +87,13 @@ impl OrderedObject {
     }
 
     /// Returns `true` if the ordered object contains the supplied key.
+    #[must_use] 
     pub fn contains_key(&self, key: &str) -> bool {
         self.pairs.iter().any(|(k, _)| k == key)
     }
 
     /// Returns a reference to the pair at the given index.
+    #[must_use] 
     pub fn get_index(&self, index: usize) -> Option<&(String, XffValue)> {
         self.pairs.get(index)
     }
@@ -243,7 +250,7 @@ impl std::fmt::Display for OrderedObject {
             if i != 0 {
                 write!(f, ", ")?;
             }
-            write!(f, "{}: {}", k, v)?;
+            write!(f, "{k}: {v}")?;
         }
         write!(f, "}}")
     }

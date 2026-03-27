@@ -64,9 +64,9 @@ pub mod maths;
 /// 1.2 => (12 * 10^-1) => 12 | 1
 /// 0.004 => (4 * 10^-3) => 4 | 3
 ///
-/// To add, you align the scales by multiplying the value of the smaller scale by 10^(scale_diff):
+/// To add, you align the scales by multiplying the value of the smaller scale by `10^(scale_diff)`:
 ///
-/// scale_diff = 3 - 1 = 2
+/// `scale_diff` = 3 - 1 = 2
 /// 1.2 => (12 * 10^2) | 1 = 1200 | 1
 ///
 /// Then add the values together:
@@ -110,6 +110,7 @@ impl HpFloat {
     ///
     /// Usefull for custom serialization
     /// Use `get_scale()` to get the scale
+    #[must_use] 
     pub fn get_value(&self) -> i128 {
         self.value
     }
@@ -118,6 +119,7 @@ impl HpFloat {
     ///
     /// Usefull for custom serialization
     /// Use `get_value()` to get the value
+    #[must_use] 
     pub fn get_scale(&self) -> u32 {
         self.scale
     }

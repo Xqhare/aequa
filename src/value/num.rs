@@ -48,6 +48,7 @@ impl Number {
     /// assert_eq!(num_u.into_usize(), Some(42));
     /// assert_eq!(num_f.into_usize(), None);
     /// ```
+    #[must_use] 
     pub fn into_usize(self) -> Option<usize> {
         match self {
             Number::Unsigned(u) => Some(u),
@@ -68,6 +69,7 @@ impl Number {
     /// assert_eq!(num_i.into_isize(), Some(-42));
     /// assert_eq!(num_f.into_isize(), None);
     /// ```
+    #[must_use] 
     pub fn into_isize(self) -> Option<isize> {
         match self {
             Number::Integer(i) => Some(i),
@@ -88,6 +90,7 @@ impl Number {
     /// assert_eq!(num_f.into_f64(), Some(42.69));
     /// assert_eq!(num_i.into_f64(), None);
     /// ```
+    #[must_use] 
     pub fn into_f64(self) -> Option<f64> {
         match self {
             Number::Float(f) => Some(f),
@@ -105,6 +108,7 @@ impl Number {
     /// let num_u = Number::from(u8::from(42));
     /// assert!(num_u.is_unsigned());
     /// ```
+    #[must_use] 
     pub fn is_unsigned(&self) -> bool {
         matches!(self, Number::Unsigned(_))
     }
@@ -119,6 +123,7 @@ impl Number {
     /// let num_i = Number::from(-42);
     /// assert!(num_i.is_integer());
     /// ```
+    #[must_use] 
     pub fn is_integer(&self) -> bool {
         matches!(self, Number::Integer(_))
     }
@@ -133,6 +138,7 @@ impl Number {
     /// let num_f = Number::from(42.69);
     /// assert!(num_f.is_float());
     /// ```
+    #[must_use] 
     pub fn is_float(&self) -> bool {
         matches!(self, Number::Float(_))
     }
@@ -152,11 +158,12 @@ impl Number {
     /// let num_f = Number::from(42.69);
     /// assert_eq!(num_f.as_string(), "42.69".to_string());
     /// ```
+    #[must_use] 
     pub fn as_string(&self) -> String {
         match self {
-            Number::Unsigned(u) => format!("{}", u),
-            Number::Integer(i) => format!("{}", i),
-            Number::Float(f) => format!("{}", f),
+            Number::Unsigned(u) => format!("{u}"),
+            Number::Integer(i) => format!("{i}"),
+            Number::Float(f) => format!("{f}"),
         }
     }
 }
@@ -251,7 +258,7 @@ impl From<&f64> for Number {
 
 impl From<f32> for Number {
     fn from(c: f32) -> Self {
-        Number::Float(c as f64)
+        Number::Float(f64::from(c))
     }
 }
 
@@ -262,9 +269,9 @@ impl From<f32> for Number {
 impl std::fmt::Display for Number {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Number::Unsigned(u) => write!(f, "{}", u),
-            Number::Integer(i) => write!(f, "{}", i),
-            Number::Float(fl) => write!(f, "{}", fl),
+            Number::Unsigned(u) => write!(f, "{u}"),
+            Number::Integer(i) => write!(f, "{i}"),
+            Number::Float(fl) => write!(f, "{fl}"),
         }
     }
 }

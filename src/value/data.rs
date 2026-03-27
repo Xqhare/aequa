@@ -41,7 +41,7 @@ impl Data {
     /// ```
     pub fn clear(&mut self) {
         self.data.clear();
-        self.len = 0
+        self.len = 0;
     }
 
     /// Returns the length of the data
@@ -54,6 +54,7 @@ impl Data {
     ///
     /// assert_eq!(data.len(), 5);
     /// ```
+    #[must_use] 
     pub fn len(&self) -> usize {
         self.len
     }
@@ -67,6 +68,7 @@ impl Data {
     /// let data = Data::from(vec![]);
     /// assert!(data.is_empty());
     /// ```
+    #[must_use] 
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -82,6 +84,7 @@ impl Data {
     /// let vector = data.into_vec();
     /// assert_eq!(vector, vec![1, 2, 3, 4, 5]);
     /// ```
+    #[must_use] 
     pub fn into_vec(self) -> Vec<u8> {
         self.data
     }

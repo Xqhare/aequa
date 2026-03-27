@@ -7,11 +7,13 @@ pub struct Uuid {
 
 impl Uuid {
     /// Creates a new Uuid from 16 bytes
+    #[must_use] 
     pub fn new(bytes: [u8; 16]) -> Self {
         Self { bytes }
     }
 
     /// Returns the raw bytes of the UUID
+    #[must_use] 
     pub fn as_bytes(&self) -> &[u8; 16] {
         &self.bytes
     }
@@ -29,7 +31,7 @@ impl std::fmt::Display for Uuid {
             if i == 4 || i == 6 || i == 8 || i == 10 {
                 write!(f, "-")?;
             }
-            write!(f, "{:02x}", byte)?;
+            write!(f, "{byte:02x}")?;
         }
         Ok(())
     }

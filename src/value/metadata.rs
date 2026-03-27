@@ -11,6 +11,7 @@ pub struct Metadata {
 
 impl Metadata {
     /// Creates a new, empty Metadata object
+    #[must_use] 
     pub fn new() -> Self {
         Self::default()
     }
@@ -21,6 +22,7 @@ impl Metadata {
     }
 
     /// Gets the creator of the file
+    #[must_use] 
     pub fn get_creator(&self) -> Option<String> {
         self.map.get("creator")?.into_string()
     }
@@ -31,6 +33,7 @@ impl Metadata {
     }
 
     /// Gets the creation timestamp
+    #[must_use] 
     pub fn get_created_at(&self) -> Option<u64> {
         if let Some(XffValue::DateTime(dt)) = self.map.get("created_at") {
             Some(*dt)
@@ -45,6 +48,7 @@ impl Metadata {
     }
 
     /// Gets the source of the data
+    #[must_use] 
     pub fn get_source(&self) -> Option<String> {
         self.map.get("source")?.into_string()
     }
@@ -55,6 +59,7 @@ impl Metadata {
     }
 
     /// Gets the description
+    #[must_use] 
     pub fn get_description(&self) -> Option<String> {
         self.map.get("description")?.into_string()
     }
@@ -65,6 +70,7 @@ impl Metadata {
     }
 
     /// Gets the license
+    #[must_use] 
     pub fn get_license(&self) -> Option<String> {
         self.map.get("license")?.into_string()
     }
@@ -81,6 +87,7 @@ impl Metadata {
     /// 
     /// Metadata can contain primitives or a single level of parent types (Array, Object, Table),
     /// but those parent types cannot contain further nested parents.
+    #[must_use] 
     pub fn is_strict_v3_compliant(&self) -> bool {
         self.map.iter().all(|(_, v)| {
             if Self::is_flat_value(v) {
@@ -99,6 +106,7 @@ impl Metadata {
     }
 
     /// Helper to check if a value is a "flat" (primitive/specialized) type.
+    #[must_use] 
     pub fn is_flat_value(value: &XffValue) -> bool {
         match value {
             XffValue::String(_) |
@@ -118,16 +126,19 @@ impl Metadata {
     }
 
     /// Gets an arbitrary metadata value
+    #[must_use] 
     pub fn get_custom(&self, key: &str) -> Option<&XffValue> {
         self.map.get(key)
     }
 
     /// Returns the number of metadata entries
+    #[must_use] 
     pub fn len(&self) -> usize {
         self.map.len()
     }
 
     /// Returns true if there are no metadata entries
+    #[must_use] 
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }

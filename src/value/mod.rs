@@ -106,7 +106,7 @@ pub enum XffValue {
     Number(Number),
     /// An array of XFF values of arbitrary length
     Array(Array),
-    /// An object of string keys and XffValue values
+    /// An object of string keys and `XffValue` values
     Object(Object),
     /// A sequence of Key-Value pairs where order is preserved
     OrderedObject(OrderedObject),
@@ -165,6 +165,7 @@ impl XffValue {
     /// assert_eq!(num_value.into_string(), Some("42.69".to_string()));
     /// assert_eq!(data_value.into_string(), None);
     /// ```
+    #[must_use] 
     pub fn into_string(&self) -> Option<String> {
         match self {
             XffValue::String(s) => Some(s.clone()),
@@ -186,6 +187,7 @@ impl XffValue {
     /// assert_eq!(string_value.into_number(), None);
     /// assert_eq!(num_value.into_number(), Some(Number::from(42.69)));
     /// ```
+    #[must_use] 
     pub fn into_number(&self) -> Option<Number> {
         match self {
             XffValue::Number(n) => Some(*n),
@@ -206,6 +208,7 @@ impl XffValue {
     /// assert_eq!(num_value.into_array(), None);
     /// assert_eq!(vec_value.into_array(), XffValue::from(vec![XffValue::from("hello mom!"), XffValue::from(42.69)]).into_array());
     /// ```
+    #[must_use] 
     pub fn into_array(&self) -> Option<Array> {
         match self {
             XffValue::Array(a) => Some(a.clone()),
@@ -233,6 +236,7 @@ impl XffValue {
     /// assert_eq!(map_value.into_object(), XffValue::from(map).into_object());
     ///
     /// ```
+    #[must_use] 
     pub fn into_object(&self) -> Option<Object> {
         match self {
             XffValue::Object(o) => Some(o.clone()),
@@ -241,6 +245,7 @@ impl XffValue {
     }
 
     /// Returns the value as an ordered object if it is a `XffValue::OrderedObject`
+    #[must_use] 
     pub fn into_ordered_object(&self) -> Option<OrderedObject> {
         match self {
             XffValue::OrderedObject(o) => Some(o.clone()),
@@ -249,6 +254,7 @@ impl XffValue {
     }
 
     /// Returns the value as a table if it is a `XffValue::Table`
+    #[must_use] 
     pub fn into_table(&self) -> Option<Table> {
         match self {
             XffValue::Table(t) => Some(t.clone()),
@@ -257,6 +263,7 @@ impl XffValue {
     }
 
     /// Returns the value as a metadata object if it is a `XffValue::Metadata`
+    #[must_use] 
     pub fn into_metadata(&self) -> Option<Metadata> {
         match self {
             XffValue::Metadata(m) => Some(m.clone()),
@@ -265,6 +272,7 @@ impl XffValue {
     }
 
     /// If the value is a Table, returns the specific row as an `XffValue::OrderedObject`.
+    #[must_use] 
     pub fn get_row(&self, index: usize) -> Option<XffValue> {
         match self {
             XffValue::Table(t) => t.get_row(index),
@@ -273,6 +281,7 @@ impl XffValue {
     }
 
     /// Returns the value as a UUID if it is a `XffValue::Uuid`
+    #[must_use] 
     pub fn into_uuid(&self) -> Option<Uuid> {
         match self {
             XffValue::Uuid(u) => Some(*u),
@@ -293,6 +302,7 @@ impl XffValue {
     /// assert_eq!(num_value.into_data(), None);
     /// assert_eq!(data_value.into_data(), XffValue::from(vec![1, 2, 3]).into_data());
     /// ```
+    #[must_use] 
     pub fn into_data(&self) -> Option<Data> {
         match self {
             XffValue::Data(d) => Some(d.clone()),
@@ -315,6 +325,7 @@ impl XffValue {
     /// assert_eq!(bool_value_true.into_boolean(), Some(true));
     /// assert_eq!(bool_value_false.into_boolean(), Some(false));
     /// ```
+    #[must_use] 
     pub fn into_boolean(&self) -> Option<bool> {
         match self {
             XffValue::Boolean(b) => Some(*b),
@@ -322,7 +333,8 @@ impl XffValue {
         }
     }
 
-    /// Returns the value as a DateTime (milliseconds since epoch) if it is a `XffValue::DateTime`
+    /// Returns the value as a `DateTime` (milliseconds since epoch) if it is a `XffValue::DateTime`
+    #[must_use] 
     pub fn into_datetime(&self) -> Option<u64> {
         match self {
             XffValue::DateTime(dt) => Some(*dt),
@@ -331,6 +343,7 @@ impl XffValue {
     }
 
     /// Returns the value as a UNIX timestamp (seconds since epoch) if it is a `XffValue::DateTime`
+    #[must_use] 
     pub fn into_unix_timestamp(&self) -> Option<f64> {
         match self {
             XffValue::DateTime(dt) => Some(*dt as f64 / 1000.0),
@@ -339,6 +352,7 @@ impl XffValue {
     }
 
     /// Returns the value as a Duration (milliseconds) if it is a `XffValue::Duration`
+    #[must_use] 
     pub fn into_duration(&self) -> Option<u64> {
         match self {
             XffValue::Duration(d) => Some(*d),
@@ -347,6 +361,7 @@ impl XffValue {
     }
 
     /// Returns the value as a Duration in seconds if it is a `XffValue::Duration`
+    #[must_use] 
     pub fn into_duration_seconds(&self) -> Option<f64> {
         match self {
             XffValue::Duration(d) => Some(*d as f64 / 1000.0),
@@ -355,6 +370,7 @@ impl XffValue {
     }
 
     /// Returns the value as a `std::time::Duration` if it is a `XffValue::Duration`
+    #[must_use] 
     pub fn into_std_duration(&self) -> Option<std::time::Duration> {
         match self {
             XffValue::Duration(d) => Some(std::time::Duration::from_millis(*d)),
@@ -362,39 +378,46 @@ impl XffValue {
         }
     }
 
-    /// Checks if the value is a DateTime
+    /// Checks if the value is a `DateTime`
+    #[must_use] 
     pub fn is_datetime(&self) -> bool {
         matches!(self, XffValue::DateTime(_))
     }
 
     /// Checks if the value is a Duration
+    #[must_use] 
     pub fn is_duration(&self) -> bool {
         matches!(self, XffValue::Duration(_))
     }
 
     /// Creates a new `XffValue::DateTime` from milliseconds since epoch
+    #[must_use] 
     pub fn from_unix_timestamp_millis(ms: u64) -> Self {
         XffValue::DateTime(ms)
     }
 
     /// Creates a new `XffValue::DateTime` from a UNIX timestamp (seconds since epoch)
+    #[must_use] 
     pub fn from_unix_timestamp(seconds: f64) -> Self {
         // Remember, DateTime is in milliseconds
         XffValue::DateTime((seconds * 1000.0) as u64)
     }
 
     /// Creates a new `XffValue::Duration` from milliseconds
+    #[must_use] 
     pub fn from_duration_millis(ms: u64) -> Self {
         XffValue::Duration(ms)
     }
 
     /// Creates a new `XffValue::Duration` from seconds
+    #[must_use] 
     pub fn from_duration_seconds(seconds: f64) -> Self {
         // Remember, Duration is in milliseconds
         XffValue::Duration((seconds * 1000.0) as u64)
     }
 
     /// Returns the value as a reference to a metadata object if it is a `XffValue::Metadata`
+    #[must_use] 
     pub fn as_metadata(&self) -> Option<&Metadata> {
         match self {
             XffValue::Metadata(m) => Some(m),
@@ -403,6 +426,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a string
+    #[must_use] 
     pub fn as_string(&self) -> Option<&String> {
         match self {
             XffValue::String(s) => Some(s),
@@ -411,6 +435,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a number
+    #[must_use] 
     pub fn as_number(&self) -> Option<&Number> {
         match self {
             XffValue::Number(n) => Some(n),
@@ -419,6 +444,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to an array
+    #[must_use] 
     pub fn as_array(&self) -> Option<&Array> {
         match self {
             XffValue::Array(a) => Some(a),
@@ -427,6 +453,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to an object
+    #[must_use] 
     pub fn as_object(&self) -> Option<&Object> {
         match self {
             XffValue::Object(o) => Some(o),
@@ -435,6 +462,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to an ordered object
+    #[must_use] 
     pub fn as_ordered_object(&self) -> Option<&OrderedObject> {
         match self {
             XffValue::OrderedObject(o) => Some(o),
@@ -443,6 +471,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a table
+    #[must_use] 
     pub fn as_table(&self) -> Option<&Table> {
         match self {
             XffValue::Table(t) => Some(t),
@@ -451,6 +480,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to data
+    #[must_use] 
     pub fn as_data(&self) -> Option<&Data> {
         match self {
             XffValue::Data(d) => Some(d),
@@ -459,6 +489,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a boolean
+    #[must_use] 
     pub fn as_boolean(&self) -> Option<&bool> {
         match self {
             XffValue::Boolean(b) => Some(b),
@@ -467,6 +498,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a datetime
+    #[must_use] 
     pub fn as_datetime(&self) -> Option<&u64> {
         match self {
             XffValue::DateTime(dt) => Some(dt),
@@ -475,6 +507,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a duration
+    #[must_use] 
     pub fn as_duration(&self) -> Option<&u64> {
         match self {
             XffValue::Duration(d) => Some(d),
@@ -483,6 +516,7 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a UUID
+    #[must_use] 
     pub fn as_uuid(&self) -> Option<&Uuid> {
         match self {
             XffValue::Uuid(u) => Some(u),
@@ -599,6 +633,7 @@ impl XffValue {
     /// assert_eq!(num_value.into_null(), Some(()));
     /// assert_eq!(null_value.into_null(), None);
     /// ```
+    #[must_use] 
     pub fn into_null(&self) -> Option<()> {
         match self {
             XffValue::Null => None,
@@ -619,6 +654,7 @@ impl XffValue {
     /// assert!(!num_value.is_string());
     /// assert!(string_value.is_string());
     /// ```
+    #[must_use] 
     pub fn is_string(&self) -> bool {
         matches!(self, XffValue::String(_))
     }
@@ -636,6 +672,7 @@ impl XffValue {
     /// assert!(!string_value.is_number());
     /// assert!(number_value.is_number());
     /// ```
+    #[must_use] 
     pub fn is_number(&self) -> bool {
         matches!(self, XffValue::Number(_))
     }
@@ -653,6 +690,7 @@ impl XffValue {
     /// assert!(!string_value.is_array());
     /// assert!(array_value.is_array());
     /// ```
+    #[must_use] 
     pub fn is_array(&self) -> bool {
         matches!(self, XffValue::Array(_))
     }
@@ -670,31 +708,37 @@ impl XffValue {
     /// assert!(!string_value.is_object());
     /// assert!(object_value.is_object());
     /// ```
+    #[must_use] 
     pub fn is_object(&self) -> bool {
         matches!(self, XffValue::Object(_))
     }
 
     /// Checks if the value is an ordered object
+    #[must_use] 
     pub fn is_ordered_object(&self) -> bool {
         matches!(self, XffValue::OrderedObject(_))
     }
 
     /// Checks if the value is a table
+    #[must_use] 
     pub fn is_table(&self) -> bool {
         matches!(self, XffValue::Table(_))
     }
 
     /// Checks if the value is a metadata object
+    #[must_use] 
     pub fn is_metadata(&self) -> bool {
         matches!(self, XffValue::Metadata(_))
     }
 
     /// Checks if the value has metadata attached (for Table, Object, or Metadata types)
+    #[must_use] 
     pub fn has_metadata(&self) -> bool {
         matches!(self, XffValue::Metadata(_))
     }
 
     /// Checks if the value is a UUID
+    #[must_use] 
     pub fn is_uuid(&self) -> bool {
         matches!(self, XffValue::Uuid(_))
     }
@@ -712,6 +756,7 @@ impl XffValue {
     /// assert!(!string_value.is_data());
     /// assert!(data_value.is_data());
     /// ```
+    #[must_use] 
     pub fn is_data(&self) -> bool {
         matches!(self, XffValue::Data(_))
     }
@@ -729,6 +774,7 @@ impl XffValue {
     /// assert!(!string_value.is_boolean());
     /// assert!(boolean_value.is_boolean());
     /// ```
+    #[must_use] 
     pub fn is_boolean(&self) -> bool {
         matches!(self, XffValue::Boolean(_))
     }
@@ -748,6 +794,7 @@ impl XffValue {
     /// assert!(!boolean_value_false.is_true());
     /// assert!(boolean_value_true.is_true());
     /// ```
+    #[must_use] 
     pub fn is_true(&self) -> bool {
         matches!(self, XffValue::Boolean(true))
     }
@@ -767,6 +814,7 @@ impl XffValue {
     /// assert!(!boolean_value_true.is_false());
     /// assert!(boolean_value_false.is_false());
     /// ```
+    #[must_use] 
     pub fn is_false(&self) -> bool {
         matches!(self, XffValue::Boolean(false))
     }
@@ -784,21 +832,25 @@ impl XffValue {
     /// assert!(!string_value.is_null());
     /// assert!(null_value.is_null());
     /// ```
+    #[must_use] 
     pub fn is_null(&self) -> bool {
         matches!(self, XffValue::Null)
     }
 
     /// Checks if the value is NaN
+    #[must_use] 
     pub fn is_nan(&self) -> bool {
         matches!(self, XffValue::NaN)
     }
 
     /// Checks if the value is Infinity
+    #[must_use] 
     pub fn is_infinity(&self) -> bool {
         matches!(self, XffValue::Infinity)
     }
 
     /// Checks if the value is Negative Infinity
+    #[must_use] 
     pub fn is_neg_infinity(&self) -> bool {
         matches!(self, XffValue::NegInfinity)
     }
@@ -1085,35 +1137,35 @@ impl From<std::time::SystemTime> for XffValue {
 impl std::fmt::Display for XffValue {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            XffValue::String(s) => write!(f, "{}", s),
-            XffValue::Number(n) => write!(f, "{}", n),
-            XffValue::Array(a) => write!(f, "{}", a),
-            XffValue::Object(o) => write!(f, "{}", o),
+            XffValue::String(s) => write!(f, "{s}"),
+            XffValue::Number(n) => write!(f, "{n}"),
+            XffValue::Array(a) => write!(f, "{a}"),
+            XffValue::Object(o) => write!(f, "{o}"),
             XffValue::OrderedObject(o) => {
                 write!(f, "{{(ordered) ")?;
                 for (i, (k, v)) in o.iter().enumerate() {
                     if i != 0 {
                         write!(f, ", ")?;
                     }
-                    write!(f, "{}: {}", k, v)?;
+                    write!(f, "{k}: {v}")?;
                 }
                 write!(f, "}}")
             }
-            XffValue::Table(t) => write!(f, "{}", t),
-            XffValue::Metadata(m) => write!(f, "{}", m),
-            XffValue::Data(d) => write!(f, "{}", d),
-            XffValue::Boolean(b) => write!(f, "{}", b),
-            XffValue::DateTime(dt) => write!(f, "DT({})", dt),
-            XffValue::Duration(d) => write!(f, "DUR({})", d),
-            XffValue::Uuid(u) => write!(f, "{}", u),
+            XffValue::Table(t) => write!(f, "{t}"),
+            XffValue::Metadata(m) => write!(f, "{m}"),
+            XffValue::Data(d) => write!(f, "{d}"),
+            XffValue::Boolean(b) => write!(f, "{b}"),
+            XffValue::DateTime(dt) => write!(f, "DT({dt})"),
+            XffValue::Duration(d) => write!(f, "DUR({d})"),
+            XffValue::Uuid(u) => write!(f, "{u}"),
             XffValue::NaN => write!(f, "NaN"),
             XffValue::Infinity => write!(f, "Infinity"),
             XffValue::NegInfinity => write!(f, "-Infinity"),
             XffValue::Null => write!(f, "null"),
 
             // Legacy - v0 only - debug will suffice
-            XffValue::CommandCharacter(cmd) => write!(f, "{:?}", cmd),
-            XffValue::ArrayCmdChar(acmd) => write!(f, "{:?}", acmd),
+            XffValue::CommandCharacter(cmd) => write!(f, "{cmd:?}"),
+            XffValue::ArrayCmdChar(acmd) => write!(f, "{acmd:?}"),
         }
     }
 }
