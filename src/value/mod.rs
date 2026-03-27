@@ -56,7 +56,7 @@ mod tests;
 ///
 /// # Example
 /// ```rust
-/// use athena::{XffValue, Number, Array, Object, Data, Metadata};
+/// use aequa::{XffValue, Number, Array, Object, Data, Metadata};
 ///
 /// let string_val = XffValue::from("hello mom!");
 /// let num_val = XffValue::from(42.69);
@@ -155,7 +155,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::{XffValue, Number, Data};
+    /// use aequa::{XffValue, Number, Data};
     ///
     /// let string_value = XffValue::from("hello mom!");
     /// let num_value = XffValue::from(42.69);
@@ -178,7 +178,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::{XffValue, Number};
+    /// use aequa::{XffValue, Number};
     ///
     /// let num_value = XffValue::from(42.69);
     /// let string_value = XffValue::from("hello mom!");
@@ -198,7 +198,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let vec_value = XffValue::from(vec![XffValue::from("hello mom!"), XffValue::from(42.69)]);
     /// let num_value = XffValue::from(42.69);
@@ -219,7 +219,7 @@ impl XffValue {
     /// # Example
     /// ```rust
     /// use std::collections::BTreeMap;
-    /// use athena::{XffValue, Number};
+    /// use aequa::{XffValue, Number};
     ///
     /// let map = BTreeMap::from([
     ///     ("key0".to_string(), XffValue::from("value0")),
@@ -285,7 +285,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::{XffValue, Data};
+    /// use aequa::{XffValue, Data};
     ///
     /// let data_value = XffValue::from(vec![1, 2, 3]);
     /// let num_value = XffValue::from(42.69);
@@ -305,7 +305,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let bool_value_true = XffValue::from(true);
     /// let bool_value_false = XffValue::from(false);
@@ -373,22 +373,24 @@ impl XffValue {
     }
 
     /// Creates a new `XffValue::DateTime` from milliseconds since epoch
-    pub fn new_datetime(ms: u64) -> Self {
+    pub fn from_unix_timestamp_millis(ms: u64) -> Self {
         XffValue::DateTime(ms)
     }
 
     /// Creates a new `XffValue::DateTime` from a UNIX timestamp (seconds since epoch)
     pub fn from_unix_timestamp(seconds: f64) -> Self {
+        // Remember, DateTime is in milliseconds
         XffValue::DateTime((seconds * 1000.0) as u64)
     }
 
     /// Creates a new `XffValue::Duration` from milliseconds
-    pub fn new_duration(ms: u64) -> Self {
+    pub fn from_duration_millis(ms: u64) -> Self {
         XffValue::Duration(ms)
     }
 
     /// Creates a new `XffValue::Duration` from seconds
     pub fn from_duration_seconds(seconds: f64) -> Self {
+        // Remember, Duration is in milliseconds
         XffValue::Duration((seconds * 1000.0) as u64)
     }
 
@@ -589,7 +591,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let null_value = XffValue::Null;
     /// let num_value = XffValue::from(42.69);
@@ -609,7 +611,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let string_value = XffValue::from("hello mom!");
     /// let num_value = XffValue::from(42.69);
@@ -626,7 +628,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let number_value = XffValue::from(42.69);
     /// let string_value = XffValue::from("hello mom!");
@@ -643,7 +645,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let array_value = XffValue::from(vec![XffValue::from("hello mom!"), XffValue::from(42.69)]);
     /// let string_value = XffValue::from("hello mom!");
@@ -660,7 +662,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::{XffValue, Object};
+    /// use aequa::{XffValue, Object};
     ///
     /// let object_value = XffValue::from(Object::from(vec![("key0".to_string(), XffValue::from("hello mom!")), ("key1".to_string(), XffValue::from(vec![1, 2, 3]))]));
     /// let string_value = XffValue::from("hello mom!");
@@ -702,7 +704,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::{XffValue, Data};
+    /// use aequa::{XffValue, Data};
     ///
     /// let data_value = XffValue::from(Data::from(vec![1, 2, 3]));
     /// let string_value = XffValue::from("hello mom!");
@@ -719,7 +721,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let boolean_value = XffValue::from(true);
     /// let string_value = XffValue::from("hello mom!");
@@ -736,7 +738,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let boolean_value_true = XffValue::from(true);
     /// let boolean_value_false = XffValue::from(false);
@@ -755,7 +757,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let boolean_value_true = XffValue::from(true);
     /// let boolean_value_false = XffValue::from(false);
@@ -774,7 +776,7 @@ impl XffValue {
     ///
     /// # Example
     /// ```rust
-    /// use athena::XffValue;
+    /// use aequa::XffValue;
     ///
     /// let null_value = XffValue::Null;
     /// let string_value = XffValue::from("hello mom!");

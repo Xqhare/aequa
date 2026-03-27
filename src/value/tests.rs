@@ -206,7 +206,7 @@ fn as_mut_tests() {
     }
     assert_eq!(val.as_boolean(), Some(&false));
 
-    let mut val = XffValue::new_datetime(100);
+    let mut val = XffValue::from_unix_timestamp_millis(100);
     if let Some(dt) = val.as_datetime_mut() {
         *dt = 200;
     }
@@ -232,7 +232,7 @@ fn time_interop() {
 
     // DateTime
     let dt_ms = 1647081600000; // 2022-03-12 10:40:00 UTC
-    let dt_val = XffValue::new_datetime(dt_ms);
+    let dt_val = XffValue::from_unix_timestamp_millis(dt_ms);
     assert!(dt_val.is_datetime());
     assert_eq!(dt_val.into_datetime(), Some(dt_ms));
     assert_eq!(dt_val.into_unix_timestamp(), Some(dt_ms as f64 / 1000.0));
@@ -242,7 +242,7 @@ fn time_interop() {
 
     // Duration
     let dur_ms = 5000;
-    let dur_val = XffValue::new_duration(dur_ms);
+    let dur_val = XffValue::from_duration_millis(dur_ms);
     assert!(dur_val.is_duration());
     assert_eq!(dur_val.into_duration(), Some(dur_ms));
     assert_eq!(dur_val.into_duration_seconds(), Some(5.0));
