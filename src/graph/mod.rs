@@ -26,15 +26,15 @@ impl std::fmt::Display for GraphError {
 /// The core container for the entire graph.
 ///
 /// ### Performance and Usage Notes:
-/// - **Zero Shifting**: Uses a "Free List" (Slot Map) approach to ensure stable indices. Removing elements 
+/// - **Zero Shifting**: Uses a "Free List" (Slot Map) approach to ensure stable indices. Removing elements
 ///   marks slots as empty for reuse rather than shifting the vector.
-/// - **Serialization Focused**: Designed primarily as a data serialization structure. It is highly efficient 
+/// - **Serialization Focused**: Designed primarily as a data serialization structure. It is highly efficient
 ///   for in-place reads and mutations, but performance for massive deletion/churn is non-optimal.
-/// - **Scale Limits**: Tracking inbound/outbound connections uses `Vec` ($O(\text{degree})$ removal). 
+/// - **Scale Limits**: Tracking inbound/outbound connections uses `Vec` ($O(\text{degree})$ removal).
 ///   Performance may degrade for "Super Nodes" with thousands of connections.
-/// - **Memory**: Vectors do not shrink automatically. High churn (millions of adds/removes) will maintain 
+/// - **Memory**: Vectors do not shrink automatically. High churn (millions of adds/removes) will maintain
 ///   memory usage at the "high-water mark."
-/// - **Index Recycling**: Indices are reused. Document that an index (e.g., `5`) might point to "Node A" 
+/// - **Index Recycling**: Indices are reused. Document that an index (e.g., `5`) might point to "Node A"
 ///   initially, but if deleted, the next `add_node` may assign index `5` to "Node B."
 pub struct Graph {
     /// Index 0 is the root / entry node by convention.
@@ -66,7 +66,7 @@ impl Graph {
 
     /// Adds a new node to the graph and returns its unique index.
     ///
-    /// **Convention**: The first node added (which will receive index 0) is considered 
+    /// **Convention**: The first node added (which will receive index 0) is considered
     /// the "Root" or "Entry" node of the graph and cannot be removed.
     pub fn add_node(&mut self, payload: XffValue, metadata: XffValue) -> u32 {
         let node = GraphNode::new(payload, metadata);
@@ -117,7 +117,12 @@ impl Graph {
     ///
     /// # Errors
     /// Returns `GraphError::NodeNotFound` if either the `from` or `to` node does not exist.
-    pub fn add_connection(&mut self, from: u32, to: u32, metadata: XffValue) -> Result<u32, GraphError> {
+    pub fn add_connection(
+        &mut self,
+        from: u32,
+        to: u32,
+        metadata: XffValue,
+    ) -> Result<u32, GraphError> {
         if !self.has_node(from) {
             return Err(GraphError::NodeNotFound(from));
         }
@@ -170,7 +175,9 @@ impl Graph {
 
     /// Returns true if a node exists at the given index.
     pub fn has_node(&self, index: u32) -> bool {
-        self.nodes.get(index as usize).map_or(false, |n| n.is_some())
+        self.nodes
+            .get(index as usize)
+            .map_or(false, |n| n.is_some())
     }
 
     /// Returns a reference to a node if it exists.
@@ -271,7 +278,7 @@ impl Graph {
         while let Some(current) = stack.pop() {
             if seen.insert(current) {
                 visited.push(current);
-                // We process children in reverse to maintain a predictable 
+                // We process children in reverse to maintain a predictable
                 // left-to-right order similar to the vector order.
                 let mut children = self.get_children(current);
                 children.reverse();
@@ -291,10 +298,10 @@ impl Graph {
         if from == to {
             return self.has_node(from);
         }
-        
+
         let mut queue = std::collections::VecDeque::new();
         queue.push_back(from);
-        
+
         let mut seen = std::collections::HashSet::new();
         seen.insert(from);
 
@@ -354,12 +361,14 @@ impl Graph {
 
     /// Returns the number of connections pointing to this node.
     pub fn in_degree(&self, node_index: u32) -> Option<usize> {
-        self.get_node(node_index).map(|n| n.inbound_connections.len())
+        self.get_node(node_index)
+            .map(|n| n.inbound_connections.len())
     }
 
     /// Returns the number of connections originating from this node.
     pub fn out_degree(&self, node_index: u32) -> Option<usize> {
-        self.get_node(node_index).map(|n| n.outbound_connections.len())
+        self.get_node(node_index)
+            .map(|n| n.outbound_connections.len())
     }
 
     /// Returns true if the node has no outbound connections.
@@ -500,7 +509,7 @@ impl Graph {
     /// Exports the graph into a format compatible with `athena::utils::sorting::topological_sort::kahns`.
     ///
     /// The format is a vector of tuples: `(node_name, dependencies)`.
-    /// Node names are derived from the node's `payload` if it's a string, or "Node {idx}" otherwise.
+    /// Node names are derived from the node's `id`, as "{idx}".
     ///
     /// **Note**: Topological sorting is not implemented in `aequa` to avoid dependency cycles.
     /// Use `athena` for this functionality.
@@ -508,15 +517,12 @@ impl Graph {
         let mut export = Vec::new();
         for i in 0..self.nodes.len() {
             let idx = i as u32;
-            if let Some(node) = self.get_node(idx) {
-                let name = node.payload.as_string().cloned().unwrap_or_else(|| format!("Node {}", idx));
-                let parents = self.get_parents(idx)
+            if self.get_node(idx).is_some() {
+                let name = format!("{idx}");
+                let parents = self
+                    .get_parents(idx)
                     .into_iter()
-                    .map(|p_idx| {
-                        self.get_node(p_idx)
-                            .and_then(|n| n.payload.as_string().cloned())
-                            .unwrap_or_else(|| format!("Node {}", p_idx))
-                    })
+                    .map(|p_idx| format!("{p_idx}"))
                     .collect();
                 export.push((name, parents));
             }
