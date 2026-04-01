@@ -12,7 +12,7 @@ fn general() {
     ]));
     let data_val = XffValue::from(Data::from(vec![1, 2, 3]));
     let boolean_val = XffValue::from(true);
-    let null_val = XffValue::Null;
+    let null_val = XffValue::default();
 
     assert!(string_val.is_string());
     assert!(num_val.is_number());
@@ -150,7 +150,10 @@ fn test_v3_variants() {
     assert!(uuid_val.is_uuid());
     assert!(uuid_val.into_uuid().is_some());
 
-    let ord_obj_val = XffValue::from(vec![("key".to_string(), XffValue::from(1))]);
+    let ord_obj_val = XffValue::OrderedObject(OrderedObject::from(vec![(
+        "key".to_string(),
+        XffValue::from(1),
+    )]));
     assert!(ord_obj_val.is_ordered_object());
     assert!(ord_obj_val.into_ordered_object().is_some());
     assert_eq!(ord_obj_val["key"], XffValue::from(1));
@@ -165,9 +168,9 @@ fn test_v3_variants() {
 
     let ninf_val = XffValue::NegInfinity;
     assert!(ninf_val.is_neg_infinity());
-    assert_eq!(format!("{}", ninf_val), "-Infinity");
+    assert_eq!(format!("{}", ninf_val), "NegInfinity");
 
-    let dt_val = XffValue::DateTime(123456789);
+    let dt_val = XffValue::from_unix_timestamp_millis(123456789);
     assert!(dt_val.is_datetime());
     assert_eq!(dt_val.as_datetime(), Some(&123456789));
     assert_eq!(format!("{}", dt_val), "DT(123456789)");
