@@ -15,8 +15,8 @@ pub struct GraphNode {
 impl Default for GraphNode {
     fn default() -> Self {
         GraphNode {
-            payload: XffValue::Null,
-            metadata: XffValue::Null,
+            payload: XffValue::default(),
+            metadata: XffValue::default(),
             inbound_connections: Vec::new(),
             outbound_connections: Vec::new(),
         }

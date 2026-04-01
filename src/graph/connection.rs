@@ -14,7 +14,7 @@ impl Default for GraphConnection {
         GraphConnection {
             from: 0,
             to: 0,
-            metadata: XffValue::Null,
+            metadata: XffValue::default(),
         }
     }
 }
