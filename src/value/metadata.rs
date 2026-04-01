@@ -143,6 +143,21 @@ impl Metadata {
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
+
+    /// Returns the underlying object
+    pub fn into_object(self) -> Object {
+        self.map
+    }
+
+    /// Returns a reference to the underlying object
+    pub fn as_object(&self) -> &Object {
+        &self.map
+    }
+
+    /// Returns a mutable reference to the underlying object
+    pub fn as_mut_object(&mut self) -> &mut Object {
+        &mut self.map
+    }
 }
 
 impl From<Object> for Metadata {
