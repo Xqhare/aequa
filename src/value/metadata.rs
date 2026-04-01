@@ -18,7 +18,7 @@ impl Metadata {
 
     /// Sets the creator of the file
     pub fn set_creator(&mut self, creator: String) {
-        self.map.insert("creator", XffValue::String(creator));
+        self.map.insert("creator", XffValue::from(creator));
     }
 
     /// Gets the creator of the file
@@ -29,14 +29,14 @@ impl Metadata {
 
     /// Sets the creation timestamp (milliseconds since epoch)
     pub fn set_created_at(&mut self, timestamp: u64) {
-        self.map.insert("created_at", XffValue::DateTime(timestamp));
+        self.map.insert("created_at", XffValue::from(timestamp));
     }
 
     /// Gets the creation timestamp
     #[must_use]
     pub fn get_created_at(&self) -> Option<u64> {
         if let Some(XffValue::DateTime(dt)) = self.map.get("created_at") {
-            Some(*dt)
+            Some(dt.0)
         } else {
             None
         }
@@ -44,7 +44,7 @@ impl Metadata {
 
     /// Sets the source of the data
     pub fn set_source(&mut self, source: String) {
-        self.map.insert("source", XffValue::String(source));
+        self.map.insert("source", XffValue::from(source));
     }
 
     /// Gets the source of the data
@@ -55,8 +55,7 @@ impl Metadata {
 
     /// Sets a human-readable summary
     pub fn set_description(&mut self, description: String) {
-        self.map
-            .insert("description", XffValue::String(description));
+        self.map.insert("description", XffValue::from(description));
     }
 
     /// Gets the description
@@ -67,7 +66,7 @@ impl Metadata {
 
     /// Sets the license
     pub fn set_license(&mut self, license: String) {
-        self.map.insert("license", XffValue::String(license));
+        self.map.insert("license", XffValue::from(license));
     }
 
     /// Gets the license
