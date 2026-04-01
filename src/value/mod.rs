@@ -1,21 +1,31 @@
 use std::collections::{BTreeMap, HashMap};
 
 pub use array::Array;
+pub use boolean::Boolean;
 pub use cmd_char::CommandCharacter;
 pub use data::Data;
+pub use datetime::DateTime;
+pub use duration::Duration;
 pub use metadata::Metadata;
 pub use num::Number;
 pub use object::Object;
 pub use ordered_object::OrderedObject;
+pub use string_val::XffString;
 pub use table::Table;
 pub use uuid::Uuid;
 
 /// Contains the `Array` type, representing a list of `XffValue`s.
 pub mod array;
+/// Contains the `Boolean` type.
+pub mod boolean;
 /// Contains the `CommandCharacter` type, used in v0 (deprecated).
 pub mod cmd_char;
 /// Contains the `Data` type, wrapping arbitrary bytes.
 pub mod data;
+/// Contains the `DateTime` type.
+pub mod datetime;
+/// Contains the `Duration` type.
+pub mod duration;
 /// Contains the `Metadata` type.
 pub mod metadata;
 /// Contains the `Number` type, capable of storing various precisions.
@@ -24,6 +34,8 @@ pub mod num;
 pub mod object;
 /// Contains the `OrderedObject` type, a key-value mapping that preserves insertion order.
 pub mod ordered_object;
+/// Contains the `XffString` type.
+pub mod string_val;
 /// Contains the `Table` type, a schema-based data structure.
 pub mod table;
 /// Contains the `Uuid` type, a 128-bit unique identifier wrapper.
@@ -31,7 +43,7 @@ pub mod uuid;
 
 mod tests;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// An enum for the different types of XFF values.
 ///
 /// Many From traits are implemented for convenience on `XffValue` directly.
@@ -101,7 +113,7 @@ mod tests;
 /// ```
 pub enum XffValue {
     /// A string value
-    String(String),
+    String(XffString),
     /// A numeric value
     Number(Number),
     /// An array of XFF values of arbitrary length
@@ -117,11 +129,11 @@ pub enum XffValue {
     /// A data value, holding arbitrary bytes
     Data(Data),
     /// A boolean value, true or false
-    Boolean(bool),
+    Boolean(Boolean),
     /// Date and Time (milliseconds since epoch)
-    DateTime(u64),
+    DateTime(DateTime),
     /// Duration in milliseconds
-    Duration(u64),
+    Duration(Duration),
     /// 128-bit UUID
     Uuid(Uuid),
     /// Not a Number
@@ -130,7 +142,6 @@ pub enum XffValue {
     Infinity,
     /// Negative Infinity
     NegInfinity,
-    #[default]
     /// A null value, a.k.a. `None`, `Nill` or `nothing`
     Null,
     /// Deprecated
@@ -141,6 +152,12 @@ pub enum XffValue {
     /// Only used in v0, needed for legacy usage
     /// An array of `CommandCharacter`s
     ArrayCmdChar(Vec<CommandCharacter>),
+}
+
+impl Default for XffValue {
+    fn default() -> Self {
+        XffValue::Null
+    }
 }
 
 // -----------------------------------------------------------
@@ -168,7 +185,7 @@ impl XffValue {
     #[must_use]
     pub fn into_string(&self) -> Option<String> {
         match self {
-            XffValue::String(s) => Some(s.clone()),
+            XffValue::String(s) => Some(s.value.clone()),
             XffValue::Number(n) => Some(n.as_string()),
             _ => None,
         }
@@ -328,7 +345,7 @@ impl XffValue {
     #[must_use]
     pub fn into_boolean(&self) -> Option<bool> {
         match self {
-            XffValue::Boolean(b) => Some(*b),
+            XffValue::Boolean(b) => Some(b.0),
             _ => None,
         }
     }
@@ -337,7 +354,7 @@ impl XffValue {
     #[must_use]
     pub fn into_datetime(&self) -> Option<u64> {
         match self {
-            XffValue::DateTime(dt) => Some(*dt),
+            XffValue::DateTime(dt) => Some(dt.0),
             _ => None,
         }
     }
@@ -346,7 +363,7 @@ impl XffValue {
     #[must_use]
     pub fn into_unix_timestamp(&self) -> Option<f64> {
         match self {
-            XffValue::DateTime(dt) => Some(*dt as f64 / 1000.0),
+            XffValue::DateTime(dt) => Some(dt.0 as f64 / 1000.0),
             _ => None,
         }
     }
@@ -355,7 +372,7 @@ impl XffValue {
     #[must_use]
     pub fn into_duration(&self) -> Option<u64> {
         match self {
-            XffValue::Duration(d) => Some(*d),
+            XffValue::Duration(d) => Some(d.0),
             _ => None,
         }
     }
@@ -364,7 +381,7 @@ impl XffValue {
     #[must_use]
     pub fn into_duration_seconds(&self) -> Option<f64> {
         match self {
-            XffValue::Duration(d) => Some(*d as f64 / 1000.0),
+            XffValue::Duration(d) => Some(d.0 as f64 / 1000.0),
             _ => None,
         }
     }
@@ -373,7 +390,7 @@ impl XffValue {
     #[must_use]
     pub fn into_std_duration(&self) -> Option<std::time::Duration> {
         match self {
-            XffValue::Duration(d) => Some(std::time::Duration::from_millis(*d)),
+            XffValue::Duration(d) => Some(std::time::Duration::from_millis(d.0)),
             _ => None,
         }
     }
@@ -393,27 +410,27 @@ impl XffValue {
     /// Creates a new `XffValue::DateTime` from milliseconds since epoch
     #[must_use]
     pub fn from_unix_timestamp_millis(ms: u64) -> Self {
-        XffValue::DateTime(ms)
+        XffValue::DateTime(DateTime(ms))
     }
 
     /// Creates a new `XffValue::DateTime` from a UNIX timestamp (seconds since epoch)
     #[must_use]
     pub fn from_unix_timestamp(seconds: f64) -> Self {
         // Remember, DateTime is in milliseconds
-        XffValue::DateTime((seconds * 1000.0) as u64)
+        XffValue::DateTime(DateTime((seconds * 1000.0) as u64))
     }
 
     /// Creates a new `XffValue::Duration` from milliseconds
     #[must_use]
     pub fn from_duration_millis(ms: u64) -> Self {
-        XffValue::Duration(ms)
+        XffValue::Duration(Duration(ms))
     }
 
     /// Creates a new `XffValue::Duration` from seconds
     #[must_use]
     pub fn from_duration_seconds(seconds: f64) -> Self {
         // Remember, Duration is in milliseconds
-        XffValue::Duration((seconds * 1000.0) as u64)
+        XffValue::Duration(Duration((seconds * 1000.0) as u64))
     }
 
     /// Returns the value as a reference to a metadata object if it is a `XffValue::Metadata`
@@ -429,7 +446,7 @@ impl XffValue {
     #[must_use]
     pub fn as_string(&self) -> Option<&String> {
         match self {
-            XffValue::String(s) => Some(s),
+            XffValue::String(s) => Some(&s.value),
             _ => None,
         }
     }
@@ -492,7 +509,7 @@ impl XffValue {
     #[must_use]
     pub fn as_boolean(&self) -> Option<&bool> {
         match self {
-            XffValue::Boolean(b) => Some(b),
+            XffValue::Boolean(b) => Some(&b.0),
             _ => None,
         }
     }
@@ -501,7 +518,7 @@ impl XffValue {
     #[must_use]
     pub fn as_datetime(&self) -> Option<&u64> {
         match self {
-            XffValue::DateTime(dt) => Some(dt),
+            XffValue::DateTime(dt) => Some(&dt.0),
             _ => None,
         }
     }
@@ -510,7 +527,7 @@ impl XffValue {
     #[must_use]
     pub fn as_duration(&self) -> Option<&u64> {
         match self {
-            XffValue::Duration(d) => Some(d),
+            XffValue::Duration(d) => Some(&d.0),
             _ => None,
         }
     }
@@ -527,7 +544,7 @@ impl XffValue {
     /// Returns the value as a mutable reference to a string
     pub fn as_string_mut(&mut self) -> Option<&mut String> {
         match self {
-            XffValue::String(s) => Some(s),
+            XffValue::String(s) => Some(&mut s.value),
             _ => None,
         }
     }
@@ -591,7 +608,7 @@ impl XffValue {
     /// Returns the value as a mutable reference to a boolean
     pub fn as_boolean_mut(&mut self) -> Option<&mut bool> {
         match self {
-            XffValue::Boolean(b) => Some(b),
+            XffValue::Boolean(b) => Some(&mut b.0),
             _ => None,
         }
     }
@@ -599,7 +616,7 @@ impl XffValue {
     /// Returns the value as a mutable reference to a datetime
     pub fn as_datetime_mut(&mut self) -> Option<&mut u64> {
         match self {
-            XffValue::DateTime(dt) => Some(dt),
+            XffValue::DateTime(dt) => Some(&mut dt.0),
             _ => None,
         }
     }
@@ -607,7 +624,7 @@ impl XffValue {
     /// Returns the value as a mutable reference to a duration
     pub fn as_duration_mut(&mut self) -> Option<&mut u64> {
         match self {
-            XffValue::Duration(d) => Some(d),
+            XffValue::Duration(d) => Some(&mut d.0),
             _ => None,
         }
     }
@@ -796,7 +813,7 @@ impl XffValue {
     /// ```
     #[must_use]
     pub fn is_true(&self) -> bool {
-        matches!(self, XffValue::Boolean(true))
+        matches!(self, XffValue::Boolean(Boolean(true)))
     }
 
     /// Checks if the value is both a boolean and false, returns `true` if it is.
@@ -816,7 +833,7 @@ impl XffValue {
     /// ```
     #[must_use]
     pub fn is_false(&self) -> bool {
-        matches!(self, XffValue::Boolean(false))
+        matches!(self, XffValue::Boolean(Boolean(false)))
     }
 
     /// Checks if the value is null, returns `true` if it is.
@@ -901,12 +918,6 @@ impl From<OrderedObject> for XffValue {
     }
 }
 
-impl From<Vec<(String, XffValue)>> for XffValue {
-    fn from(c: Vec<(String, XffValue)>) -> Self {
-        XffValue::OrderedObject(OrderedObject::from(c))
-    }
-}
-
 impl From<Array> for XffValue {
     fn from(c: Array) -> Self {
         XffValue::Array(c)
@@ -936,7 +947,31 @@ impl From<Data> for XffValue {
 
 impl From<bool> for XffValue {
     fn from(c: bool) -> Self {
+        XffValue::Boolean(Boolean::from(c))
+    }
+}
+
+impl From<Boolean> for XffValue {
+    fn from(c: Boolean) -> Self {
         XffValue::Boolean(c)
+    }
+}
+
+impl From<XffString> for XffValue {
+    fn from(c: XffString) -> Self {
+        XffValue::String(c)
+    }
+}
+
+impl From<DateTime> for XffValue {
+    fn from(c: DateTime) -> Self {
+        XffValue::DateTime(c)
+    }
+}
+
+impl From<Duration> for XffValue {
+    fn from(c: Duration) -> Self {
+        XffValue::Duration(c)
     }
 }
 
@@ -1008,12 +1043,12 @@ where
                         if check_float.is_ok() {
                             XffValue::Number(Number::from(check_float.as_ref().unwrap()))
                         } else {
-                            XffValue::String(string)
+                            XffValue::String(XffString::from(string))
                         }
                     }
                 }
             }
-            1 => XffValue::String(c.0.into()),
+            1 => XffValue::String(XffString::from(c.0.into())),
             _ => unreachable!(),
         }
     }
@@ -1021,25 +1056,25 @@ where
 
 impl From<String> for XffValue {
     fn from(c: String) -> Self {
-        XffValue::String(c)
+        XffValue::String(XffString::from(c))
     }
 }
 
 impl From<&String> for XffValue {
     fn from(c: &String) -> Self {
-        XffValue::String(c.clone())
+        XffValue::String(XffString::from(c.clone()))
     }
 }
 
 impl From<&str> for XffValue {
     fn from(c: &str) -> Self {
-        XffValue::String(c.to_string())
+        XffValue::String(XffString::from(c.to_string()))
     }
 }
 
 impl From<char> for XffValue {
     fn from(c: char) -> Self {
-        XffValue::String(c.to_string())
+        XffValue::String(XffString::from(c.to_string()))
     }
 }
 
@@ -1117,15 +1152,15 @@ impl From<i8> for XffValue {
 
 impl From<std::time::Duration> for XffValue {
     fn from(c: std::time::Duration) -> Self {
-        XffValue::Duration(c.as_millis() as u64)
+        XffValue::Duration(Duration::from(c.as_millis() as u64))
     }
 }
 
 impl From<std::time::SystemTime> for XffValue {
     fn from(c: std::time::SystemTime) -> Self {
         match c.duration_since(std::time::UNIX_EPOCH) {
-            Ok(d) => XffValue::DateTime(d.as_millis() as u64),
-            Err(_) => XffValue::DateTime(0),
+            Ok(d) => XffValue::DateTime(DateTime::from(d.as_millis() as u64)),
+            Err(_) => XffValue::DateTime(DateTime::from(0)),
         }
     }
 }
@@ -1155,13 +1190,13 @@ impl std::fmt::Display for XffValue {
             XffValue::Metadata(m) => write!(f, "{m}"),
             XffValue::Data(d) => write!(f, "{d}"),
             XffValue::Boolean(b) => write!(f, "{b}"),
-            XffValue::DateTime(dt) => write!(f, "DT({dt})"),
-            XffValue::Duration(d) => write!(f, "DUR({d})"),
+            XffValue::DateTime(dt) => write!(f, "{dt}"),
+            XffValue::Duration(d) => write!(f, "{d}"),
             XffValue::Uuid(u) => write!(f, "{u}"),
             XffValue::NaN => write!(f, "NaN"),
             XffValue::Infinity => write!(f, "Infinity"),
-            XffValue::NegInfinity => write!(f, "-Infinity"),
-            XffValue::Null => write!(f, "null"),
+            XffValue::NegInfinity => write!(f, "NegInfinity"),
+            XffValue::Null => write!(f, "Null"),
 
             // Legacy - v0 only - debug will suffice
             XffValue::CommandCharacter(cmd) => write!(f, "{cmd:?}"),
