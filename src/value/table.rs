@@ -65,7 +65,7 @@ impl Table {
         for (i, col_name) in self.columns.iter().enumerate() {
             ordered_obj.push(
                 col_name.clone(),
-                row_data.get(i).cloned().unwrap_or(XffValue::Null),
+                row_data.get(i).cloned().unwrap_or_else(|| XffValue::default()),
             );
         }
         Some(XffValue::OrderedObject(ordered_obj))
