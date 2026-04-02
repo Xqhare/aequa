@@ -25,6 +25,7 @@ Aequa is designed to be a reliable, zero-dependency foundation for high-fidelity
 ## Key Features
 
 ### 1. High-Precision Arithmetic (`HpFloat`)
+
 `HpFloat` is a decimal-based arbitrary precision type that avoids the pitfalls of IEEE 754 floating-point math (e.g., `0.1 + 0.2` is exactly `0.3`).
 
 - **Drop-in Support**: Provides type aliases for `f64` and `f32` to allow easy migration by shadowing primitives.
@@ -33,7 +34,8 @@ Aequa is designed to be a reliable, zero-dependency foundation for high-fidelity
 - **XFF V4 Support**: Will be compatible with XFF v4. Will then become part of `XffValue`.
 
 ### 2. XFF Value Ecosystem (`XffValue`)
-`XffValue` is the central dynamic enum for all XFF data types, representing the **logical** (in-memory) state of data.
+
+`XffValue` is the central dynamic enum for all XFF data types, representing the logical (in-memory) state of data.
 
 - **Rich Types**: Supports `String`, `Number`, `Boolean`, `Array`, `Object`, `OrderedObject`, `Data` (bytes), `Table` (schema-based), `Uuid`, `DateTime`, `Duration`, and `Null`.
 - **Order Preservation**: Includes `OrderedObject` for key-value mappings that preserve insertion order.
@@ -41,6 +43,7 @@ Aequa is designed to be a reliable, zero-dependency foundation for high-fidelity
 - **Ergonomic API**: Extensive use of `is_*`, `as_*`, and `into_*` methods for intuitive data handling.
 
 ### 3. Graph Data Structure (`Graph`)
+
 A flexible, high-performance graph structure designed for serialization and complex relationship mapping.
 
 - **Stable Indices**: Uses a "Free List" approach to ensure indices remain stable during node/connection removal.
@@ -51,7 +54,8 @@ A flexible, high-performance graph structure designed for serialization and comp
 
 ## Philosophy: No External Dependencies
 
-Aequa follows an even stricter "no external dependencies" rule than my other projects. It relies exclusively on the Rust standard library. This ensures:
+While my other projects follow a "no external dependencies" rule that occasionally includes `libc`, Aequa is even stricter. It relies exclusively on the Rust standard library. This ensures:
+
 - **Maximum Portability**: Can be easily integrated into any project or environment.
 - **Security**: Zero supply-chain risk from third-party crates.
 - **Long-term Stability**: Not subject to the breaking changes or deprecation cycles of external libraries.
