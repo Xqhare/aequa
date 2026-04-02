@@ -90,7 +90,7 @@ While my other projects follow a "no external dependencies" rule that occasional
 The API of `XffValue` is not subject to breaking changes at any point.
 I ensure this by extensive testing coverage, especially using the documentation examples.
 
-At the time of writing, Aequa has more than 200 tests.
+At the time of writing, Aequa has more than 200 tests, as well as several examples making use of `XffValue`.
 
 Another way I ensure this guarantee is by defining the characteristics of `XffValue` in the [xff specification](https://github.com/xqhare/nabu/tree/master/specifications).
 
@@ -209,6 +209,7 @@ As a standard Rust library:
 ```bash
 cargo build
 cargo test
+cargo test --examples
 ```
 
 ## License
