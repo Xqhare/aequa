@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 pub mod hp_float;
 
 pub mod graph;

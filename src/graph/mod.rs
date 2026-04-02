@@ -6,6 +6,8 @@ mod node;
 pub use connection::*;
 pub use node::*;
 
+// TODO: Before stabilising inside XffValue, remove Error and move to returning None instead. No
+// other XffValue errors like this.
 #[derive(Debug, PartialEq, Eq)]
 pub enum GraphError {
     /// Attempted to create a connection from or to a node that does not exist.
@@ -232,6 +234,48 @@ impl Graph {
             .map_or(false, |n| n.is_some())
     }
 
+    /// Returns an iterator over every node in the graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert!(graph.get_all_nodes().any(|n| n.metadata == XffValue::Null));
+    /// ```
+    pub fn get_all_nodes(&self) -> impl Iterator<Item = &GraphNode> {
+        self.nodes.iter().filter_map(|n| n.as_ref())
+    }
+
+    /// Returns an iterator over every node in the graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert!(graph.get_all_nodes().any(|n| n.metadata == XffValue::Null));
+    /// ```
+    pub fn get_all_nodes_mut(&mut self) -> impl Iterator<Item = &mut GraphNode> {
+        self.nodes.iter_mut().filter_map(|n| n.as_mut())
+    }
+
+    /// Returns an iterator over every node index in the graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert!(graph.get_all_nodes_indices().any(|n| n == n0));
+    /// ```
+    pub fn get_all_nodes_indices(&self) -> impl Iterator<Item = u32> {
+        self.nodes
+            .iter()
+            .enumerate()
+            .filter_map(|(i, _)| i.try_into().ok())
+    }
+
     /// Returns a reference to a node if it exists.
     ///
     /// # Example
@@ -256,6 +300,54 @@ impl Graph {
     /// ```
     pub fn get_node_mut(&mut self, index: u32) -> Option<&mut GraphNode> {
         self.nodes.get_mut(index as usize).and_then(|n| n.as_mut())
+    }
+
+    /// Returns an iterator over every connection in the graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert!(graph.get_all_connections().any(|c| c.metadata == XffValue::Null));
+    /// ```
+    pub fn get_all_connections(&self) -> impl Iterator<Item = &GraphConnection> {
+        self.connections.iter().filter_map(|c| c.as_ref())
+    }
+
+    /// Returns an iterator over every connection in the graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert!(graph.get_all_connections().any(|c| c.metadata == XffValue::Null));
+    /// ```
+    pub fn get_all_connections_mut(&mut self) -> impl Iterator<Item = &mut GraphConnection> {
+        self.connections.iter_mut().filter_map(|c| c.as_mut())
+    }
+
+    /// Returns an iterator over every connection index in the graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert!(graph.get_all_connections_indices().any(|c| c == c0));
+    /// ```
+    pub fn get_all_connections_indices(&self) -> impl Iterator<Item = u32> {
+        self.connections
+            .iter()
+            .enumerate()
+            .filter_map(|(i, c)| c.as_ref().map(|_| i as u32))
     }
 
     /// Returns a reference to a connection if it exists.

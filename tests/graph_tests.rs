@@ -7,6 +7,7 @@ use aequa::{
 fn test_graph_add_remove_nodes() {
     let mut graph = Graph::new();
 
+    // Add nodes - In the format of (payload, metadata)
     let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
     let n1 = graph.add_node(XffValue::from("node1"), XffValue::Null);
     let n2 = graph.add_node(XffValue::from("node2"), XffValue::Null);
@@ -53,6 +54,7 @@ fn test_graph_add_connection_validation() {
     let n1 = graph.add_node(XffValue::from("node1"), XffValue::Null);
     let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
     assert_eq!(c0, 0);
+    assert!(graph.get_connection(c0).is_some());
 
     // Invalid from node
     let res = graph.add_connection(99, n1, XffValue::Null);
