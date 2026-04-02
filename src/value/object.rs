@@ -98,9 +98,16 @@ pub struct Object {
 // -----------------------------------------------------------
 
 impl Object {
-    /// Creates an empty object
+    /// Creates a new and empty `Object`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Object;
+    /// let object = Object::new();
+    /// ```
     #[must_use]
     pub fn new() -> Self {
+
         Object {
             map: BTreeMap::new(),
         }

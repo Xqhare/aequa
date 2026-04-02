@@ -1,5 +1,21 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 /// A 128-bit Universally Unique Identifier (UUID).
+///
+/// Can be created with `Uuid::new()` or `Uuid::from()`.
+///
+/// Most functionality needed for interacting with the underlying bytes is provided trough the struct itself.
+///
+/// Access to the underlying bytes is provided through the `as_bytes()` method.
+///
+/// `Uuid` implements `From<[u8; 16]>`.
+///
+/// # Examples
+/// ```rust
+/// use aequa::Uuid;
+///
+/// let uuid = Uuid::new([0; 16]);
+/// assert_eq!(uuid.as_bytes(), &[0; 16]);
+/// ```
 pub struct Uuid {
     /// The 16 raw bytes of the UUID
     pub bytes: [u8; 16],
@@ -7,12 +23,25 @@ pub struct Uuid {
 
 impl Uuid {
     /// Creates a new Uuid from 16 bytes
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Uuid;
+    /// let uuid = Uuid::new([0; 16]);
+    /// ```
     #[must_use]
     pub fn new(bytes: [u8; 16]) -> Self {
         Self { bytes }
     }
 
     /// Returns the raw bytes of the UUID
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Uuid;
+    /// let uuid = Uuid::new([1; 16]);
+    /// assert_eq!(uuid.as_bytes()[0], 1);
+    /// ```
     #[must_use]
     pub fn as_bytes(&self) -> &[u8; 16] {
         &self.bytes

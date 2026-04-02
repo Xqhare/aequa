@@ -29,6 +29,21 @@ pub struct Data {
 // -----------------------------------------------------------
 
 impl Data {
+    /// Creates a new, empty `Data` object.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Data;
+    /// let data = Data::new();
+    /// ```
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            data: Vec::new(),
+            len: 0,
+        }
+    }
+
     /// Clears the data
     ///
     /// # Example

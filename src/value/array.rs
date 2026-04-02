@@ -69,6 +69,12 @@ pub struct Array {
 
 impl Array {
     /// Creates a new and empty `Array`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Array;
+    /// let array = Array::new();
+    /// ```
     #[must_use]
     pub fn new() -> Self {
         Array { values: Vec::new() }

@@ -1,9 +1,15 @@
 #[derive(Debug, Clone, PartialEq, Copy, PartialOrd)]
 /// A numeric value.
 ///
-/// `Number::form()` is implemented for all numeric types
+/// Can be created with `Number::from()`.
 ///
-/// # Example
+/// `Number` can represent unsigned integers, signed integers, or floating point numbers.
+///
+/// Most functionality needed for interacting with the underlying number is provided trough the struct itself.
+///
+/// `Number` implements `From` for all primitive numeric types.
+///
+/// # Examples
 /// ```rust
 /// use aequa::Number;
 ///
@@ -16,7 +22,6 @@
 /// assert!(num_integer.is_integer());
 ///
 /// assert_eq!(num_float.into_usize(), None);
-///
 /// assert_eq!(num_unsigned.into_usize(), Some(42));
 ///
 /// assert_eq!(num_integer.as_string(), "-42".to_string());

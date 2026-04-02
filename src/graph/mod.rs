@@ -60,6 +60,12 @@ impl Default for Graph {
 
 impl Graph {
     /// Creates a new, empty graph.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::graph::Graph;
+    /// let graph = Graph::new();
+    /// ```
     pub fn new() -> Self {
         Self::default()
     }
@@ -68,6 +74,14 @@ impl Graph {
     ///
     /// **Convention**: The first node added (which will receive index 0) is considered
     /// the "Root" or "Entry" node of the graph and cannot be removed.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let idx = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert_eq!(idx, 0);
+    /// ```
     pub fn add_node(&mut self, payload: XffValue, metadata: XffValue) -> u32 {
         let node = GraphNode::new(payload, metadata);
         if let Some(index) = self.free_nodes.pop() {
@@ -84,6 +98,16 @@ impl Graph {
     ///
     /// - **Root Protection**: Attempting to remove index 0 will do nothing.
     /// - **Stability**: Indices of other nodes remain stable.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("node1"), XffValue::Null);
+    /// graph.remove_node(n1);
+    /// assert!(!graph.has_node(n1));
+    /// ```
     pub fn remove_node(&mut self, index: u32) {
         if index == 0 {
             // Index 0 is the root by convention and cannot be removed.
@@ -117,6 +141,15 @@ impl Graph {
     ///
     /// # Errors
     /// Returns `GraphError::NodeNotFound` if either the `from` or `to` node does not exist.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// ```
     pub fn add_connection(
         &mut self,
         from: u32,
@@ -152,6 +185,17 @@ impl Graph {
     }
 
     /// Removes a connection from the graph by its index.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// graph.remove_connection(c0);
+    /// assert!(graph.get_connection(c0).is_none());
+    /// ```
     pub fn remove_connection(&mut self, index: u32) {
         if index as usize >= self.connections.len() {
             return;
@@ -174,6 +218,14 @@ impl Graph {
     }
 
     /// Returns true if a node exists at the given index.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert!(graph.has_node(n0));
+    /// ```
     pub fn has_node(&self, index: u32) -> bool {
         self.nodes
             .get(index as usize)
@@ -181,16 +233,42 @@ impl Graph {
     }
 
     /// Returns a reference to a node if it exists.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert!(graph.get_node(n0).is_some());
+    /// ```
     pub fn get_node(&self, index: u32) -> Option<&GraphNode> {
         self.nodes.get(index as usize).and_then(|n| n.as_ref())
     }
 
     /// Returns a mutable reference to a node if it exists.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("root"), XffValue::Null);
+    /// assert!(graph.get_node_mut(n0).is_some());
+    /// ```
     pub fn get_node_mut(&mut self, index: u32) -> Option<&mut GraphNode> {
         self.nodes.get_mut(index as usize).and_then(|n| n.as_mut())
     }
 
     /// Returns a reference to a connection if it exists.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert!(graph.get_connection(c0).is_some());
+    /// ```
     pub fn get_connection(&self, index: u32) -> Option<&GraphConnection> {
         self.connections
             .get(index as usize)
@@ -198,6 +276,16 @@ impl Graph {
     }
 
     /// Returns a mutable reference to a connection if it exists.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert!(graph.get_connection_mut(c0).is_some());
+    /// ```
     pub fn get_connection_mut(&mut self, index: u32) -> Option<&mut GraphConnection> {
         self.connections
             .get_mut(index as usize)
@@ -205,6 +293,16 @@ impl Graph {
     }
 
     /// Returns the indices of all nodes that are directly connected from the given node.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert_eq!(graph.get_children(n0), vec![n1]);
+    /// ```
     pub fn get_children(&self, node_index: u32) -> Vec<u32> {
         let mut children = Vec::new();
         if let Some(node) = self.get_node(node_index) {
@@ -218,6 +316,16 @@ impl Graph {
     }
 
     /// Returns the indices of all nodes that directly connect to the given node.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert_eq!(graph.get_parents(n1), vec![n0]);
+    /// ```
     pub fn get_parents(&self, node_index: u32) -> Vec<u32> {
         let mut parents = Vec::new();
         if let Some(node) = self.get_node(node_index) {
@@ -234,6 +342,16 @@ impl Graph {
     /// Returns a list of node indices in the order they were visited.
     ///
     /// This is useful for finding all reachable nodes or processing levels in a tech tree.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("1"), XffValue::Null);
+    /// graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert_eq!(graph.traverse_bfs(n0), vec![n0, n1]);
+    /// ```
     pub fn traverse_bfs(&self, start_index: u32) -> Vec<u32> {
         let mut visited = Vec::new();
         let mut queue = std::collections::VecDeque::new();
@@ -264,6 +382,16 @@ impl Graph {
     /// Returns a list of node indices in the order they were visited.
     ///
     /// This is useful for finding all dependencies of a node or exploring deep paths first.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("1"), XffValue::Null);
+    /// graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert_eq!(graph.traverse_dfs(n0), vec![n0, n1]);
+    /// ```
     pub fn traverse_dfs(&self, start_index: u32) -> Vec<u32> {
         let mut visited = Vec::new();
         let mut stack = Vec::new();
@@ -294,6 +422,16 @@ impl Graph {
     }
 
     /// Checks if there is a path from the `from` node to the `to` node.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("1"), XffValue::Null);
+    /// graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert!(graph.is_reachable(n0, n1));
+    /// ```
     pub fn is_reachable(&self, from: u32, to: u32) -> bool {
         if from == to {
             return self.has_node(from);
@@ -321,6 +459,15 @@ impl Graph {
     /// Checks if the graph contains any cycles.
     ///
     /// This uses a recursive DFS approach with three states (unvisited, visiting, visited).
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// graph.add_connection(n0, n0, XffValue::Null).unwrap();
+    /// assert!(graph.has_cycle());
+    /// ```
     pub fn has_cycle(&self) -> bool {
         let mut visited = std::collections::HashSet::new();
         let mut stack = std::collections::HashSet::new();
@@ -360,29 +507,71 @@ impl Graph {
     }
 
     /// Returns the number of connections pointing to this node.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// assert_eq!(graph.in_degree(n0), Some(0));
+    /// ```
     pub fn in_degree(&self, node_index: u32) -> Option<usize> {
         self.get_node(node_index)
             .map(|n| n.inbound_connections.len())
     }
 
     /// Returns the number of connections originating from this node.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// assert_eq!(graph.out_degree(n0), Some(0));
+    /// ```
     pub fn out_degree(&self, node_index: u32) -> Option<usize> {
         self.get_node(node_index)
             .map(|n| n.outbound_connections.len())
     }
 
     /// Returns true if the node has no outbound connections.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// assert!(graph.is_leaf(n0));
+    /// ```
     pub fn is_leaf(&self, node_index: u32) -> bool {
         self.out_degree(node_index) == Some(0)
     }
 
     /// Returns true if the node has no inbound connections.
     /// Note: This is a structural check and is independent of the index 0 "Root" convention.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// assert!(graph.is_root_node(n0));
+    /// ```
     pub fn is_root_node(&self, node_index: u32) -> bool {
         self.in_degree(node_index) == Some(0)
     }
 
     /// Returns the indices of all connections between two specific nodes.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("n0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("n1"), XffValue::Null);
+    /// let c0 = graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert_eq!(graph.find_connections(n0, n1), vec![c0]);
+    /// ```
     pub fn find_connections(&self, from: u32, to: u32) -> Vec<u32> {
         let mut found = Vec::new();
         if let Some(node) = self.get_node(from) {
@@ -399,6 +588,16 @@ impl Graph {
 
     /// Finds the shortest path (in terms of number of edges) between two nodes.
     /// Returns a list of node indices if a path exists.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// let n1 = graph.add_node(XffValue::from("1"), XffValue::Null);
+    /// graph.add_connection(n0, n1, XffValue::Null).unwrap();
+    /// assert_eq!(graph.find_path(n0, n1), Some(vec![n0, n1]));
+    /// ```
     pub fn find_path(&self, from: u32, to: u32) -> Option<Vec<u32>> {
         if !self.has_node(from) || !self.has_node(to) {
             return None;
@@ -439,6 +638,15 @@ impl Graph {
     /// An SCC is a sub-graph where every node is reachable from every other node in that sub-graph.
     ///
     /// Uses Tarjan's algorithm ($O(V+E)$).
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// let sccs = graph.find_sccs();
+    /// assert_eq!(sccs.len(), 1);
+    /// ```
     pub fn find_sccs(&self) -> Vec<Vec<u32>> {
         let mut index = 0;
         let mut stack = Vec::new();
@@ -513,6 +721,15 @@ impl Graph {
     ///
     /// **Note**: Topological sorting is not implemented in `aequa` to avoid dependency cycles.
     /// Use `athena` for this functionality.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::Graph, XffValue};
+    /// let mut graph = Graph::new();
+    /// let n0 = graph.add_node(XffValue::from("0"), XffValue::Null);
+    /// let export = graph.export_for_topological_sort();
+    /// assert_eq!(export.len(), 1);
+    /// ```
     pub fn export_for_topological_sort(&self) -> Vec<(String, Vec<String>)> {
         let mut export = Vec::new();
         for i in 0..self.nodes.len() {

@@ -91,12 +91,27 @@ pub struct HpFloat {
 
 impl HpFloat {
     /// Creates a new `HpFloat` with the given value and scale
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::new(123, 2);
+    /// assert_eq!(float.to_string(), "1.23");
+    /// ```
     #[must_use]
     pub const fn new(value: i128, scale: u32) -> Self {
         Self { value, scale }
     }
 
     /// Trims trailing zeros from the decimal part to simplify the scale.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::new(100, 2);
+    /// let trimmed = float.trim_scale();
+    /// assert_eq!(trimmed.get_scale(), 0);
+    /// ```
     #[must_use]
     pub fn trim_scale(mut self) -> Self {
         while self.scale > 0 && self.value % 10 == 0 {
@@ -110,6 +125,13 @@ impl HpFloat {
     ///
     /// Usefull for custom serialization
     /// Use `get_scale()` to get the scale
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::new(123, 2);
+    /// assert_eq!(float.get_value(), 123);
+    /// ```
     #[must_use]
     pub fn get_value(&self) -> i128 {
         self.value
@@ -119,6 +141,13 @@ impl HpFloat {
     ///
     /// Usefull for custom serialization
     /// Use `get_value()` to get the value
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::new(123, 2);
+    /// assert_eq!(float.get_scale(), 2);
+    /// ```
     #[must_use]
     pub fn get_scale(&self) -> u32 {
         self.scale

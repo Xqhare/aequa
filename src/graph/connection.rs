@@ -18,3 +18,16 @@ impl Default for GraphConnection {
         }
     }
 }
+
+impl GraphConnection {
+    /// Creates a new `GraphConnection` with the given from/to nodes and metadata.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{graph::GraphConnection, XffValue};
+    /// let conn = GraphConnection::new(0, 1, XffValue::Null);
+    /// ```
+    pub fn new(from: u32, to: u32, metadata: XffValue) -> Self {
+        Self { from, to, metadata }
+    }
+}

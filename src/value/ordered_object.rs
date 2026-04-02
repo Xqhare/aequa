@@ -5,7 +5,25 @@ use super::XffValue;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 /// An object made up of key-value pairs of XFF values where the order of insertion is preserved.
 ///
-/// Internally uses a `Vec<(String, XffValue)>`.
+/// Can be created with `OrderedObject::new()` or `OrderedObject::from_vec()`.
+///
+/// Most functionality needed for interacting with the underlying vector is provided trough the struct itself.
+///
+/// Access to the underlying pairs is provided through the `pairs` field.
+///
+/// `OrderedObject` implements `From<Vec<(S, V)>>`, `From<HashMap<S, V>>`, and `From<BTreeMap<S, V>>`.
+///
+/// # Examples
+/// ```rust
+/// use aequa::OrderedObject;
+///
+/// let mut obj = OrderedObject::new();
+/// obj.push("first", 1);
+/// obj.push("second", 2);
+///
+/// assert_eq!(obj.len(), 2);
+/// assert_eq!(obj[0].0, "first");
+/// ```
 pub struct OrderedObject {
     /// The underlying key-value pairs
     pub pairs: Vec<(String, XffValue)>,
@@ -13,24 +31,51 @@ pub struct OrderedObject {
 
 impl OrderedObject {
     /// Creates a new, empty ordered object.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let obj = OrderedObject::new();
+    /// ```
     #[must_use]
     pub fn new() -> Self {
         Self { pairs: Vec::new() }
     }
 
     /// Creates an ordered object from a vector of pairs.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{OrderedObject, XffValue};
+    /// let obj = OrderedObject::from_vec(vec![("key".to_string(), XffValue::from(1))]);
+    /// ```
     #[must_use]
     pub fn from_vec(pairs: Vec<(String, XffValue)>) -> Self {
         Self { pairs }
     }
 
     /// Returns the number of elements in the ordered object.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// assert_eq!(obj.len(), 1);
+    /// ```
     #[must_use]
     pub fn len(&self) -> usize {
         self.pairs.len()
     }
 
     /// Returns `true` if the ordered object is empty.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let obj = OrderedObject::new();
+    /// assert!(obj.is_empty());
+    /// ```
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.pairs.is_empty()
@@ -39,6 +84,13 @@ impl OrderedObject {
     /// Adds a key-value pair to the end of the ordered object.
     ///
     /// If you want to replace an existing key while preserving order, use `insert`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// ```
     pub fn push<K: Into<String>, V: Into<XffValue>>(&mut self, key: K, value: V) {
         self.pairs.push((key.into(), value.into()));
     }
@@ -47,6 +99,13 @@ impl OrderedObject {
     ///
     /// If the key already exists, the value is updated and the position is preserved.
     /// If the key does not exist, the pair is added to the end.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.insert("key", 1);
+    /// ```
     pub fn insert<K: Into<String>, V: Into<XffValue>>(&mut self, key: K, value: V) {
         let key = key.into();
         let value = value.into();
@@ -58,6 +117,15 @@ impl OrderedObject {
     }
 
     /// Removes a key-value pair from the ordered object.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// obj.remove("key");
+    /// assert!(obj.is_empty());
+    /// ```
     pub fn remove(&mut self, key: &str) -> Option<XffValue> {
         if let Some(pos) = self.pairs.iter().position(|(k, _)| k == key) {
             Some(self.pairs.remove(pos).1)
@@ -67,6 +135,15 @@ impl OrderedObject {
     }
 
     /// Clears the ordered object.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// obj.clear();
+    /// assert!(obj.is_empty());
+    /// ```
     pub fn clear(&mut self) {
         self.pairs.clear();
     }
@@ -74,6 +151,14 @@ impl OrderedObject {
     /// Returns a reference to the value associated with the key, if it exists.
     ///
     /// Note: This is an O(n) operation.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{OrderedObject, XffValue};
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// assert_eq!(obj.get("key"), Some(&XffValue::from(1)));
+    /// ```
     #[must_use]
     pub fn get(&self, key: &str) -> Option<&XffValue> {
         self.pairs.iter().find(|(k, _)| k == key).map(|(_, v)| v)
@@ -82,6 +167,17 @@ impl OrderedObject {
     /// Returns a mutable reference to the value associated with the key, if it exists.
     ///
     /// Note: This is an O(n) operation.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{OrderedObject, XffValue};
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// if let Some(val) = obj.get_mut("key") {
+    ///     *val = XffValue::from(2);
+    /// }
+    /// assert_eq!(obj.get("key"), Some(&XffValue::from(2)));
+    /// ```
     pub fn get_mut(&mut self, key: &str) -> Option<&mut XffValue> {
         self.pairs
             .iter_mut()
@@ -90,28 +186,70 @@ impl OrderedObject {
     }
 
     /// Returns `true` if the ordered object contains the supplied key.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// assert!(obj.contains_key("key"));
+    /// ```
     #[must_use]
     pub fn contains_key(&self, key: &str) -> bool {
         self.pairs.iter().any(|(k, _)| k == key)
     }
 
     /// Returns a reference to the pair at the given index.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// assert!(obj.get_index(0).is_some());
+    /// ```
     #[must_use]
     pub fn get_index(&self, index: usize) -> Option<&(String, XffValue)> {
         self.pairs.get(index)
     }
 
     /// Returns a mutable reference to the pair at the given index.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// assert!(obj.get_index_mut(0).is_some());
+    /// ```
     pub fn get_index_mut(&mut self, index: usize) -> Option<&mut (String, XffValue)> {
         self.pairs.get_mut(index)
     }
 
     /// Returns an iterator over the key-value pairs.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// let mut iter = obj.iter();
+    /// assert!(iter.next().is_some());
+    /// ```
     pub fn iter(&self) -> std::slice::Iter<'_, (String, XffValue)> {
         self.pairs.iter()
     }
 
     /// Returns a mutable iterator over the key-value pairs.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::OrderedObject;
+    /// let mut obj = OrderedObject::new();
+    /// obj.push("key", 1);
+    /// let mut iter = obj.iter_mut();
+    /// assert!(iter.next().is_some());
+    /// ```
     pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, (String, XffValue)> {
         self.pairs.iter_mut()
     }

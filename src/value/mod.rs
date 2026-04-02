@@ -112,37 +112,37 @@ mod tests;
 /// let metadata: Metadata = meta_val.into_metadata().unwrap();
 /// ```
 pub enum XffValue {
-    /// A string value
+    /// A string value, wrapping a `String`
     String(XffString),
-    /// A numeric value
+    /// A numeric value, can be unsigned, signed or float
     Number(Number),
     /// An array of XFF values of arbitrary length
     Array(Array),
-    /// An object of string keys and `XffValue` values
+    /// An object of string keys and `XffValue` values (using HashMap)
     Object(Object),
-    /// A sequence of Key-Value pairs where order is preserved
+    /// A sequence of Key-Value pairs where order of insertion is preserved
     OrderedObject(OrderedObject),
-    /// A schema-based table
+    /// A schema-based table with columns and rows
     Table(Table),
-    /// A metadata object
+    /// A metadata object providing context for an XFF file
     Metadata(Metadata),
-    /// A data value, holding arbitrary bytes
+    /// A data value, holding arbitrary bytes (Vec<u8>)
     Data(Data),
-    /// A boolean value, true or false
+    /// A boolean value (true or false)
     Boolean(Boolean),
     /// Date and Time (milliseconds since epoch)
     DateTime(DateTime),
-    /// Duration in milliseconds
+    /// A temporal duration in milliseconds
     Duration(Duration),
-    /// 128-bit UUID
+    /// A 128-bit Universally Unique Identifier
     Uuid(Uuid),
-    /// Not a Number
+    /// Not a Number (IEEE 754)
     NaN,
-    /// Positive Infinity
+    /// Positive Infinity (IEEE 754)
     Infinity,
-    /// Negative Infinity
+    /// Negative Infinity (IEEE 754)
     NegInfinity,
-    /// A null value, a.k.a. `None`, `Nill` or `nothing`
+    /// A null value, representing the absence of data
     Null,
     /// Deprecated
     /// Only used in v0, needed for legacy usage
@@ -262,6 +262,13 @@ impl XffValue {
     }
 
     /// Returns the value as an ordered object if it is a `XffValue::OrderedObject`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, OrderedObject};
+    /// let val = XffValue::OrderedObject(OrderedObject::new());
+    /// assert!(val.into_ordered_object().is_some());
+    /// ```
     #[must_use]
     pub fn into_ordered_object(&self) -> Option<OrderedObject> {
         match self {
@@ -271,6 +278,13 @@ impl XffValue {
     }
 
     /// Returns the value as a table if it is a `XffValue::Table`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Table};
+    /// let val = XffValue::Table(Table::new());
+    /// assert!(val.into_table().is_some());
+    /// ```
     #[must_use]
     pub fn into_table(&self) -> Option<Table> {
         match self {
@@ -280,6 +294,13 @@ impl XffValue {
     }
 
     /// Returns the value as a metadata object if it is a `XffValue::Metadata`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Metadata};
+    /// let val = XffValue::Metadata(Metadata::new());
+    /// assert!(val.into_metadata().is_some());
+    /// ```
     #[must_use]
     pub fn into_metadata(&self) -> Option<Metadata> {
         match self {
@@ -289,6 +310,15 @@ impl XffValue {
     }
 
     /// If the value is a Table, returns the specific row as an `XffValue::OrderedObject`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Table};
+    /// let mut table = Table::with_columns(vec!["A".to_string()]);
+    /// table.add_row(vec![XffValue::from(1)]).unwrap();
+    /// let val = XffValue::Table(table);
+    /// assert!(val.get_row(0).is_some());
+    /// ```
     #[must_use]
     pub fn get_row(&self, index: usize) -> Option<XffValue> {
         match self {
@@ -298,6 +328,13 @@ impl XffValue {
     }
 
     /// Returns the value as a UUID if it is a `XffValue::Uuid`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Uuid};
+    /// let val = XffValue::Uuid(Uuid::new([0; 16]));
+    /// assert!(val.into_uuid().is_some());
+    /// ```
     #[must_use]
     pub fn into_uuid(&self) -> Option<Uuid> {
         match self {
@@ -396,24 +433,50 @@ impl XffValue {
     }
 
     /// Checks if the value is a `DateTime`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_unix_timestamp_millis(100);
+    /// assert!(val.is_datetime());
+    /// ```
     #[must_use]
     pub fn is_datetime(&self) -> bool {
         matches!(self, XffValue::DateTime(_))
     }
 
     /// Checks if the value is a Duration
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_duration_millis(100);
+    /// assert!(val.is_duration());
+    /// ```
     #[must_use]
     pub fn is_duration(&self) -> bool {
         matches!(self, XffValue::Duration(_))
     }
 
     /// Creates a new `XffValue::DateTime` from milliseconds since epoch
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_unix_timestamp_millis(1000);
+    /// ```
     #[must_use]
     pub fn from_unix_timestamp_millis(ms: u64) -> Self {
         XffValue::DateTime(DateTime(ms))
     }
 
     /// Creates a new `XffValue::DateTime` from a UNIX timestamp (seconds since epoch)
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_unix_timestamp(1.0);
+    /// ```
     #[must_use]
     pub fn from_unix_timestamp(seconds: f64) -> Self {
         // Remember, DateTime is in milliseconds
@@ -421,12 +484,24 @@ impl XffValue {
     }
 
     /// Creates a new `XffValue::Duration` from milliseconds
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_duration_millis(1000);
+    /// ```
     #[must_use]
     pub fn from_duration_millis(ms: u64) -> Self {
         XffValue::Duration(Duration(ms))
     }
 
     /// Creates a new `XffValue::Duration` from seconds
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_duration_seconds(1.0);
+    /// ```
     #[must_use]
     pub fn from_duration_seconds(seconds: f64) -> Self {
         // Remember, Duration is in milliseconds
@@ -434,6 +509,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a metadata object if it is a `XffValue::Metadata`
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Metadata};
+    /// let val = XffValue::Metadata(Metadata::new());
+    /// assert!(val.as_metadata().is_some());
+    /// ```
     #[must_use]
     pub fn as_metadata(&self) -> Option<&Metadata> {
         match self {
@@ -443,6 +525,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a string
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from("hello");
+    /// assert_eq!(val.as_string(), Some(&"hello".to_string()));
+    /// ```
     #[must_use]
     pub fn as_string(&self) -> Option<&String> {
         match self {
@@ -452,6 +541,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a number
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Number};
+    /// let val = XffValue::from(1);
+    /// assert!(val.as_number().is_some());
+    /// ```
     #[must_use]
     pub fn as_number(&self) -> Option<&Number> {
         match self {
@@ -461,6 +557,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to an array
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Array};
+    /// let val = XffValue::Array(Array::new());
+    /// assert!(val.as_array().is_some());
+    /// ```
     #[must_use]
     pub fn as_array(&self) -> Option<&Array> {
         match self {
@@ -470,6 +573,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to an object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Object};
+    /// let val = XffValue::Object(Object::new());
+    /// assert!(val.as_object().is_some());
+    /// ```
     #[must_use]
     pub fn as_object(&self) -> Option<&Object> {
         match self {
@@ -479,6 +589,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to an ordered object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, OrderedObject};
+    /// let val = XffValue::OrderedObject(OrderedObject::new());
+    /// assert!(val.as_ordered_object().is_some());
+    /// ```
     #[must_use]
     pub fn as_ordered_object(&self) -> Option<&OrderedObject> {
         match self {
@@ -488,6 +605,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a table
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Table};
+    /// let val = XffValue::Table(Table::new());
+    /// assert!(val.as_table().is_some());
+    /// ```
     #[must_use]
     pub fn as_table(&self) -> Option<&Table> {
         match self {
@@ -497,6 +621,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to data
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Data};
+    /// let val = XffValue::Data(Data::new());
+    /// assert!(val.as_data().is_some());
+    /// ```
     #[must_use]
     pub fn as_data(&self) -> Option<&Data> {
         match self {
@@ -506,6 +637,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a boolean
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from(true);
+    /// assert_eq!(val.as_boolean(), Some(&true));
+    /// ```
     #[must_use]
     pub fn as_boolean(&self) -> Option<&bool> {
         match self {
@@ -515,6 +653,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a datetime
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_unix_timestamp_millis(100);
+    /// assert_eq!(val.as_datetime(), Some(&100));
+    /// ```
     #[must_use]
     pub fn as_datetime(&self) -> Option<&u64> {
         match self {
@@ -524,6 +669,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a duration
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let val = XffValue::from_duration_millis(100);
+    /// assert_eq!(val.as_duration(), Some(&100));
+    /// ```
     #[must_use]
     pub fn as_duration(&self) -> Option<&u64> {
         match self {
@@ -533,6 +685,13 @@ impl XffValue {
     }
 
     /// Returns the value as a reference to a UUID
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Uuid};
+    /// let val = XffValue::Uuid(Uuid::new([0; 16]));
+    /// assert!(val.as_uuid().is_some());
+    /// ```
     #[must_use]
     pub fn as_uuid(&self) -> Option<&Uuid> {
         match self {
@@ -542,6 +701,16 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a string
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let mut val = XffValue::from("hello");
+    /// if let Some(s) = val.as_string_mut() {
+    ///     s.push_str(" world");
+    /// }
+    /// assert_eq!(val.as_string().unwrap(), "hello world");
+    /// ```
     pub fn as_string_mut(&mut self) -> Option<&mut String> {
         match self {
             XffValue::String(s) => Some(&mut s.value),
@@ -550,6 +719,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a number
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Number};
+    /// let mut val = XffValue::from(1);
+    /// assert!(val.as_number_mut().is_some());
+    /// ```
     pub fn as_number_mut(&mut self) -> Option<&mut Number> {
         match self {
             XffValue::Number(n) => Some(n),
@@ -558,6 +734,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to an array
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Array};
+    /// let mut val = XffValue::Array(Array::new());
+    /// assert!(val.as_array_mut().is_some());
+    /// ```
     pub fn as_array_mut(&mut self) -> Option<&mut Array> {
         match self {
             XffValue::Array(a) => Some(a),
@@ -566,6 +749,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to an object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Object};
+    /// let mut val = XffValue::Object(Object::new());
+    /// assert!(val.as_object_mut().is_some());
+    /// ```
     pub fn as_object_mut(&mut self) -> Option<&mut Object> {
         match self {
             XffValue::Object(o) => Some(o),
@@ -574,6 +764,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to an ordered object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, OrderedObject};
+    /// let mut val = XffValue::OrderedObject(OrderedObject::new());
+    /// assert!(val.as_ordered_object_mut().is_some());
+    /// ```
     pub fn as_ordered_object_mut(&mut self) -> Option<&mut OrderedObject> {
         match self {
             XffValue::OrderedObject(o) => Some(o),
@@ -582,6 +779,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a table
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Table};
+    /// let mut val = XffValue::Table(Table::new());
+    /// assert!(val.as_table_mut().is_some());
+    /// ```
     pub fn as_table_mut(&mut self) -> Option<&mut Table> {
         match self {
             XffValue::Table(t) => Some(t),
@@ -590,6 +794,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a metadata object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Metadata};
+    /// let mut val = XffValue::Metadata(Metadata::new());
+    /// assert!(val.as_metadata_mut().is_some());
+    /// ```
     pub fn as_metadata_mut(&mut self) -> Option<&mut Metadata> {
         match self {
             XffValue::Metadata(m) => Some(m),
@@ -598,6 +809,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to data
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Data};
+    /// let mut val = XffValue::Data(Data::new());
+    /// assert!(val.as_data_mut().is_some());
+    /// ```
     pub fn as_data_mut(&mut self) -> Option<&mut Data> {
         match self {
             XffValue::Data(d) => Some(d),
@@ -606,6 +824,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a boolean
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let mut val = XffValue::from(true);
+    /// assert!(val.as_boolean_mut().is_some());
+    /// ```
     pub fn as_boolean_mut(&mut self) -> Option<&mut bool> {
         match self {
             XffValue::Boolean(b) => Some(&mut b.0),
@@ -614,6 +839,16 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a datetime
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let mut val = XffValue::from_unix_timestamp_millis(100);
+    /// if let Some(dt) = val.as_datetime_mut() {
+    ///     *dt = 200;
+    /// }
+    /// assert_eq!(val.as_datetime(), Some(&200));
+    /// ```
     pub fn as_datetime_mut(&mut self) -> Option<&mut u64> {
         match self {
             XffValue::DateTime(dt) => Some(&mut dt.0),
@@ -622,6 +857,16 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a duration
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::XffValue;
+    /// let mut val = XffValue::from_duration_millis(100);
+    /// if let Some(d) = val.as_duration_mut() {
+    ///     *d = 200;
+    /// }
+    /// assert_eq!(val.as_duration(), Some(&200));
+    /// ```
     pub fn as_duration_mut(&mut self) -> Option<&mut u64> {
         match self {
             XffValue::Duration(d) => Some(&mut d.0),
@@ -630,6 +875,13 @@ impl XffValue {
     }
 
     /// Returns the value as a mutable reference to a UUID
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Uuid};
+    /// let mut val = XffValue::Uuid(Uuid::new([0; 16]));
+    /// assert!(val.as_uuid_mut().is_some());
+    /// ```
     pub fn as_uuid_mut(&mut self) -> Option<&mut Uuid> {
         match self {
             XffValue::Uuid(u) => Some(u),
@@ -731,30 +983,65 @@ impl XffValue {
     }
 
     /// Checks if the value is an ordered object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, OrderedObject};
+    /// let val = XffValue::OrderedObject(OrderedObject::new());
+    /// assert!(val.is_ordered_object());
+    /// ```
     #[must_use]
     pub fn is_ordered_object(&self) -> bool {
         matches!(self, XffValue::OrderedObject(_))
     }
 
     /// Checks if the value is a table
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Table};
+    /// let val = XffValue::Table(Table::new());
+    /// assert!(val.is_table());
+    /// ```
     #[must_use]
     pub fn is_table(&self) -> bool {
         matches!(self, XffValue::Table(_))
     }
 
     /// Checks if the value is a metadata object
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Metadata};
+    /// let val = XffValue::Metadata(Metadata::new());
+    /// assert!(val.is_metadata());
+    /// ```
     #[must_use]
     pub fn is_metadata(&self) -> bool {
         matches!(self, XffValue::Metadata(_))
     }
 
     /// Checks if the value has metadata attached (for Table, Object, or Metadata types)
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Metadata};
+    /// let val = XffValue::Metadata(Metadata::new());
+    /// assert!(val.has_metadata());
+    /// ```
     #[must_use]
     pub fn has_metadata(&self) -> bool {
         matches!(self, XffValue::Metadata(_))
     }
 
     /// Checks if the value is a UUID
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::{XffValue, Uuid};
+    /// let val = XffValue::Uuid(Uuid::new([0; 16]));
+    /// assert!(val.is_uuid());
+    /// ```
     #[must_use]
     pub fn is_uuid(&self) -> bool {
         matches!(self, XffValue::Uuid(_))
