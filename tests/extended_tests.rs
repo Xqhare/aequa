@@ -1,5 +1,26 @@
 use aequa::hp_float::f64;
-use aequa::value::{Table, OrderedObject, XffValue};
+use aequa::value::{OrderedObject, Table, XffValue};
+
+#[test]
+fn logic_float() {
+    // Test 1: Scientific notation in From
+    let small: f64 = 0.0000000001.into();
+    println!("0.0000000001 as Aequa: {:?}", small);
+
+    // Test 2: Multiplication logic
+    // 0.1 * 0.1 should be 0.01 (scale 2)
+    let a: f64 = 0.1.into();
+    let b: f64 = 0.1.into();
+    let res = a * b;
+    println!("0.1 * 0.1 = {:?}", res);
+
+    // Test 3: High Precision String (Bypass f64 16-digit limit)
+    // 30 decimal places
+    let hp_str = "0.123456789012345678901234567890";
+    let hp: f64 = f64::from_str(hp_str).unwrap();
+    println!("High Precision String (30 digits): {:?}", hp);
+    assert_eq!(hp.get_scale(), 30);
+}
 
 #[test]
 fn test_hp_float_scientific_notation() {
@@ -36,11 +57,23 @@ fn test_hp_float_trim_scale_edge_cases() {
 fn test_table_row_column_mismatch() {
     let mut table = Table::with_columns(vec!["A".to_string(), "B".to_string()]);
     // Valid row
-    assert!(table.add_row(vec![XffValue::from(1), XffValue::from(2)]).is_ok());
+    assert!(
+        table
+            .add_row(vec![XffValue::from(1), XffValue::from(2)])
+            .is_ok()
+    );
     // Invalid row (too few)
     assert!(table.add_row(vec![XffValue::from(3)]).is_err());
     // Invalid row (too many)
-    assert!(table.add_row(vec![XffValue::from(4), XffValue::from(5), XffValue::from(6)]).is_err());
+    assert!(
+        table
+            .add_row(vec![
+                XffValue::from(4),
+                XffValue::from(5),
+                XffValue::from(6)
+            ])
+            .is_err()
+    );
 }
 
 #[test]
