@@ -101,6 +101,8 @@ As soon as these types are merged into `XffValue`, the stability guarantee will 
 
 ## Usage
 
+More examples can be found in the [examples](https://github.com/xqhare/aequa/tree/master/examples) directory.
+
 ### Importing
 
 Add the following to your `Cargo.toml`:
