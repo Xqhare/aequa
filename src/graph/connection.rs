@@ -1,6 +1,7 @@
 use crate::XffValue;
 
 /// A directional link between two nodes.
+#[derive(Debug, Clone, PartialEq)]
 pub struct GraphConnection {
     /// The index of the originating node.
     pub from: u32,

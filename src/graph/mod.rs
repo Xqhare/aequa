@@ -38,6 +38,7 @@ impl std::fmt::Display for GraphError {
 ///   memory usage at the "high-water mark."
 /// - **Index Recycling**: Indices are reused. Document that an index (e.g., `5`) might point to "Node A"
 ///   initially, but if deleted, the next `add_node` may assign index `5` to "Node B."
+#[derive(Debug, Clone, PartialEq)]
 pub struct Graph {
     /// Index 0 is the root / entry node by convention.
     nodes: Vec<Option<GraphNode>>,
@@ -47,6 +48,12 @@ pub struct Graph {
     free_nodes: Vec<u32>,
     /// Indices of connections that have been removed and are available for reuse.
     free_connections: Vec<u32>,
+}
+
+impl PartialOrd for Graph {
+    fn partial_cmp(&self, _other: &Self) -> Option<std::cmp::Ordering> {
+        None
+    }
 }
 
 impl Default for Graph {

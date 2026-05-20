@@ -6,6 +6,9 @@ pub use cmd_char::CommandCharacter;
 pub use data::Data;
 pub use datetime::DateTime;
 pub use duration::Duration;
+pub use local_date::LocalDate;
+pub use local_datetime::LocalDateTime;
+pub use local_time::LocalTime;
 pub use metadata::Metadata;
 pub use num::Number;
 pub use object::Object;
@@ -26,6 +29,12 @@ pub mod data;
 pub mod datetime;
 /// Contains the `Duration` type.
 pub mod duration;
+/// Contains the `LocalDate` type.
+pub mod local_date;
+/// Contains the `LocalDateTime` type.
+pub mod local_datetime;
+/// Contains the `LocalTime` type.
+pub mod local_time;
 /// Contains the `Metadata` type.
 pub mod metadata;
 /// Contains the `Number` type, capable of storing various precisions.
@@ -114,8 +123,12 @@ mod tests;
 pub enum XffValue {
     /// A string value, wrapping a `String`
     String(XffString),
+    /// ASCII-only string (7-bit)
+    Ascii(XffString),
     /// A numeric value, can be unsigned, signed or float
     Number(Number),
+    /// A high-precision decimal float
+    HpFloat(crate::hp_float::HpFloat),
     /// An array of XFF values of arbitrary length
     Array(Array),
     /// An object of string keys and `XffValue` values (using HashMap)
@@ -124,6 +137,8 @@ pub enum XffValue {
     OrderedObject(OrderedObject),
     /// A schema-based table with columns and rows
     Table(Table),
+    /// A graph-based data structure
+    Graph(crate::graph::Graph),
     /// A metadata object providing context for an XFF file
     Metadata(Metadata),
     /// A data value, holding arbitrary bytes (Vec<u8>)
@@ -134,10 +149,20 @@ pub enum XffValue {
     DateTime(DateTime),
     /// A temporal duration in milliseconds
     Duration(Duration),
+    /// A naive date
+    LocalDate(LocalDate),
+    /// A naive time
+    LocalTime(LocalTime),
+    /// A naive date and time
+    LocalDateTime(LocalDateTime),
     /// A 128-bit Universally Unique Identifier
     Uuid(Uuid),
     /// Not a Number (IEEE 754)
     NaN,
+    /// Positive NaN (IEEE 754)
+    PNan,
+    /// Negative NaN (IEEE 754)
+    NNan,
     /// Positive Infinity (IEEE 754)
     Infinity,
     /// Negative Infinity (IEEE 754)
@@ -889,6 +914,210 @@ impl XffValue {
         }
     }
 
+    /// Returns the value as a naive date if it is a `XffValue::LocalDate`
+    #[must_use]
+    pub fn into_local_date(&self) -> Option<LocalDate> {
+        match self {
+            XffValue::LocalDate(ld) => Some(*ld),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a naive time if it is a `XffValue::LocalTime`
+    #[must_use]
+    pub fn into_local_time(&self) -> Option<LocalTime> {
+        match self {
+            XffValue::LocalTime(lt) => Some(*lt),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a naive date and time if it is a `XffValue::LocalDateTime`
+    #[must_use]
+    pub fn into_local_datetime(&self) -> Option<LocalDateTime> {
+        match self {
+            XffValue::LocalDateTime(ldt) => Some(*ldt),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as an ASCII string if it is a `XffValue::Ascii`
+    #[must_use]
+    pub fn into_ascii(&self) -> Option<XffString> {
+        match self {
+            XffValue::Ascii(s) => Some(s.clone()),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as an HpFloat if it is a `XffValue::HpFloat`
+    #[must_use]
+    pub fn into_hp_float(&self) -> Option<crate::hp_float::HpFloat> {
+        match self {
+            XffValue::HpFloat(f) => Some(f.clone()),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a Graph if it is a `XffValue::Graph`
+    #[must_use]
+    pub fn into_graph(&self) -> Option<crate::graph::Graph> {
+        match self {
+            XffValue::Graph(g) => Some(g.clone()), // Note: Graph doesn't currently implement Clone, but it should for XffValue consistency.
+            _ => None,
+        }
+    }
+
+    /// Checks if the value is a naive date
+    #[must_use]
+    pub fn is_local_date(&self) -> bool {
+        matches!(self, XffValue::LocalDate(_))
+    }
+
+    /// Checks if the value is a naive time
+    #[must_use]
+    pub fn is_local_time(&self) -> bool {
+        matches!(self, XffValue::LocalTime(_))
+    }
+
+    /// Checks if the value is a naive date and time
+    #[must_use]
+    pub fn is_local_datetime(&self) -> bool {
+        matches!(self, XffValue::LocalDateTime(_))
+    }
+
+    /// Checks if the value is an ASCII string
+    #[must_use]
+    pub fn is_ascii(&self) -> bool {
+        matches!(self, XffValue::Ascii(_))
+    }
+
+    /// Checks if the value is an HpFloat
+    #[must_use]
+    pub fn is_hp_float(&self) -> bool {
+        matches!(self, XffValue::HpFloat(_))
+    }
+
+    /// Checks if the value is a Graph
+    #[must_use]
+    pub fn is_graph(&self) -> bool {
+        matches!(self, XffValue::Graph(_))
+    }
+
+    /// Checks if the value is Positive NaN
+    #[must_use]
+    pub fn is_pnan(&self) -> bool {
+        matches!(self, XffValue::PNan)
+    }
+
+    /// Checks if the value is Negative NaN
+    #[must_use]
+    pub fn is_nnan(&self) -> bool {
+        matches!(self, XffValue::NNan)
+    }
+
+    /// Returns the value as a reference to a naive date
+    #[must_use]
+    pub fn as_local_date(&self) -> Option<&LocalDate> {
+        match self {
+            XffValue::LocalDate(ld) => Some(ld),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a reference to a naive time
+    #[must_use]
+    pub fn as_local_time(&self) -> Option<&LocalTime> {
+        match self {
+            XffValue::LocalTime(lt) => Some(lt),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a reference to a naive date and time
+    #[must_use]
+    pub fn as_local_datetime(&self) -> Option<&LocalDateTime> {
+        match self {
+            XffValue::LocalDateTime(ldt) => Some(ldt),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a reference to an ASCII string
+    #[must_use]
+    pub fn as_ascii(&self) -> Option<&XffString> {
+        match self {
+            XffValue::Ascii(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a reference to an HpFloat
+    #[must_use]
+    pub fn as_hp_float(&self) -> Option<&crate::hp_float::HpFloat> {
+        match self {
+            XffValue::HpFloat(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a reference to a Graph
+    #[must_use]
+    pub fn as_graph(&self) -> Option<&crate::graph::Graph> {
+        match self {
+            XffValue::Graph(g) => Some(g),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a mutable reference to a naive date
+    pub fn as_local_date_mut(&mut self) -> Option<&mut LocalDate> {
+        match self {
+            XffValue::LocalDate(ld) => Some(ld),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a mutable reference to a naive time
+    pub fn as_local_time_mut(&mut self) -> Option<&mut LocalTime> {
+        match self {
+            XffValue::LocalTime(lt) => Some(lt),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a mutable reference to a naive date and time
+    pub fn as_local_datetime_mut(&mut self) -> Option<&mut LocalDateTime> {
+        match self {
+            XffValue::LocalDateTime(ldt) => Some(ldt),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a mutable reference to an ASCII string
+    pub fn as_ascii_mut(&mut self) -> Option<&mut XffString> {
+        match self {
+            XffValue::Ascii(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a mutable reference to an HpFloat
+    pub fn as_hp_float_mut(&mut self) -> Option<&mut crate::hp_float::HpFloat> {
+        match self {
+            XffValue::HpFloat(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a mutable reference to a Graph
+    pub fn as_graph_mut(&mut self) -> Option<&mut crate::graph::Graph> {
+        match self {
+            XffValue::Graph(g) => Some(g),
+            _ => None,
+        }
+    }
+
     /// Returns null if it is a `XffValue::Null`
     /// Returns `None` for all other variants
     ///
@@ -1262,6 +1491,36 @@ impl From<Duration> for XffValue {
     }
 }
 
+impl From<LocalDate> for XffValue {
+    fn from(c: LocalDate) -> Self {
+        XffValue::LocalDate(c)
+    }
+}
+
+impl From<LocalTime> for XffValue {
+    fn from(c: LocalTime) -> Self {
+        XffValue::LocalTime(c)
+    }
+}
+
+impl From<LocalDateTime> for XffValue {
+    fn from(c: LocalDateTime) -> Self {
+        XffValue::LocalDateTime(c)
+    }
+}
+
+impl From<crate::hp_float::HpFloat> for XffValue {
+    fn from(c: crate::hp_float::HpFloat) -> Self {
+        XffValue::HpFloat(c)
+    }
+}
+
+impl From<crate::graph::Graph> for XffValue {
+    fn from(c: crate::graph::Graph) -> Self {
+        XffValue::Graph(c)
+    }
+}
+
 // -----------------------------------------------------------
 //                     Index implementations
 // -----------------------------------------------------------
@@ -1460,7 +1719,9 @@ impl std::fmt::Display for XffValue {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             XffValue::String(s) => write!(f, "{s}"),
+            XffValue::Ascii(s) => write!(f, "(ascii) {s}"),
             XffValue::Number(n) => write!(f, "{n}"),
+            XffValue::HpFloat(hp) => write!(f, "{hp}"),
             XffValue::Array(a) => write!(f, "{a}"),
             XffValue::Object(o) => write!(f, "{o}"),
             XffValue::OrderedObject(o) => {
@@ -1474,13 +1735,19 @@ impl std::fmt::Display for XffValue {
                 write!(f, "}}")
             }
             XffValue::Table(t) => write!(f, "{t}"),
+            XffValue::Graph(g) => write!(f, "(graph with {} nodes)", g.get_all_nodes_indices().count()),
             XffValue::Metadata(m) => write!(f, "{m}"),
             XffValue::Data(d) => write!(f, "{d}"),
             XffValue::Boolean(b) => write!(f, "{b}"),
             XffValue::DateTime(dt) => write!(f, "{dt}"),
             XffValue::Duration(d) => write!(f, "{d}"),
+            XffValue::LocalDate(ld) => write!(f, "{ld}"),
+            XffValue::LocalTime(lt) => write!(f, "{lt}"),
+            XffValue::LocalDateTime(ldt) => write!(f, "{ldt}"),
             XffValue::Uuid(u) => write!(f, "{u}"),
             XffValue::NaN => write!(f, "NaN"),
+            XffValue::PNan => write!(f, "+NaN"),
+            XffValue::NNan => write!(f, "-NaN"),
             XffValue::Infinity => write!(f, "Infinity"),
             XffValue::NegInfinity => write!(f, "NegInfinity"),
             XffValue::Null => write!(f, "Null"),

@@ -1,6 +1,7 @@
 use crate::XffValue;
 
 /// A node in the graph holding a payload and metadata.
+#[derive(Debug, Clone, PartialEq)]
 pub struct GraphNode {
     /// The payload of the node.
     pub payload: XffValue,
