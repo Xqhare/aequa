@@ -230,12 +230,20 @@ impl Metadata {
     pub fn is_flat_value(value: &XffValue) -> bool {
         match value {
             XffValue::String(_)
+            | XffValue::Ascii(_)
             | XffValue::Number(_)
+            | XffValue::HpFloat(_)
             | XffValue::Boolean(_)
             | XffValue::DateTime(_)
             | XffValue::Duration(_)
+            | XffValue::LocalDate(_)
+            | XffValue::LocalTime(_)
+            | XffValue::LocalDateTime(_)
             | XffValue::Uuid(_)
+            | XffValue::Data(_)
             | XffValue::NaN
+            | XffValue::PNan
+            | XffValue::NNan
             | XffValue::Infinity
             | XffValue::NegInfinity
             | XffValue::Null => true,
