@@ -22,14 +22,26 @@ impl std::fmt::Display for LocalDate {
     }
 }
 
-impl TryInto<LocalDate> for String {
+impl TryFrom<&str> for LocalDate {
     type Error = ();
 
-    fn try_into(self) -> Result<LocalDate, Self::Error> {
-        let mut iter = self.split('-');
-        let year = iter.next().ok_or(())?.parse().map_err(|_| ())?;
-        let month = iter.next().ok_or(())?.parse().map_err(|_| ())?;
-        let day = iter.next().ok_or(())?.parse().map_err(|_| ())?;
-        Ok(LocalDate::new(year, month, day))
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let mut it = value.split('-');
+        let year = it.next().ok_or(())?.parse().map_err(|_| ())?;
+        let month = it.next().ok_or(())?.parse().map_err(|_| ())?;
+        let day = it.next().ok_or(())?.parse().map_err(|_| ())?;
+        Ok(Self::new(year, month, day))
+    }
+}
+
+impl TryFrom<String> for LocalDate {
+    type Error = ();
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let mut it = value.split('-');
+        let year = it.next().ok_or(())?.parse().map_err(|_| ())?;
+        let month = it.next().ok_or(())?.parse().map_err(|_| ())?;
+        let day = it.next().ok_or(())?.parse().map_err(|_| ())?;
+        Ok(Self::new(year, month, day))
     }
 }
