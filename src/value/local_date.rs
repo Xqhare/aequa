@@ -21,3 +21,15 @@ impl std::fmt::Display for LocalDate {
         write!(f, "{:04}-{:02}-{:02}", self.year, self.month, self.day)
     }
 }
+
+impl TryInto<LocalDate> for String {
+    type Error = ();
+
+    fn try_into(self) -> Result<LocalDate, Self::Error> {
+        let mut iter = self.split('-');
+        let year = iter.next().ok_or(())?.parse().map_err(|_| ())?;
+        let month = iter.next().ok_or(())?.parse().map_err(|_| ())?;
+        let day = iter.next().ok_or(())?.parse().map_err(|_| ())?;
+        Ok(LocalDate::new(year, month, day))
+    }
+}
