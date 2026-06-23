@@ -31,6 +31,14 @@ Aequa is designed to be a reliable, zero-dependency foundation for high-fidelity
 - **No Dependencies**: Adhering to a strict "no external dependencies" rule (standard library and libc only).
 - **Naming**: Part of "The Pantheon" convention.
 
+## Roadmap
+
+`Talos` uses my [nomos](https://github.com/xqhare/nomos) project management system.
+
+The roadmap for this project can be found in the [nomos.md](nomos.md) file.
+
+All nomos files follow the syntax defined [here](https://github.com/Xqhare/nomos/blob/master/spec/).
+
 ## Key Features
 
 ### 1. XFF Value Ecosystem (`XffValue`)
@@ -54,12 +62,6 @@ Aequa is designed to be a reliable, zero-dependency foundation for high-fidelity
 - **Precision over Performance**: High precision math with some performance overhead.
 - **XFF V4 Support**: Will be compatible with XFF v4. Will then become part of `XffValue`.
 
-#### Road Map / To-Do
-
-- [ ] Benchmarking against the standard primitives.
-- [ ] Precision Limits: How does HpFloat handle division that results in infinite repeating decimals (e.g., 1 / 3)? Is there a default precision cutoff or an error state?
-- [ ] Advanced Math: Does it support trigonometric functions, powers, or roots, or is it strictly for basic arithmetic?
-
 ### 3. Graph Data Structure (`Graph`)
 
 A flexible, high-performance graph structure designed for serialization and complex relationship mapping.
@@ -71,10 +73,6 @@ The implementation of the `Graph` remains very bare bones, this is to increase t
 - **Algorithms**: Includes cycle detection, pathfinding (shortest path), and Strongly Connected Components (SCCs) via Tarjan's algorithm.
 - **Metadata Support**: Every node and connection can carry an `XffValue` as payload or metadata.
 - **XFF V4 Support**: Will be compatible with XFF v4. Will then become part of `XffValue`.
-
-#### Road Map / To-Do
-
-- [ ] Usability: Never ever used any graph before. The needs of the API are still largely unknown to me
 
 ## Philosophy: No External Dependencies
 
