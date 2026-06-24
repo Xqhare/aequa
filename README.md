@@ -33,7 +33,7 @@ Aequa is designed to be a reliable, zero-dependency foundation for high-fidelity
 
 ## Roadmap
 
-`Talos` uses my [nomos](https://github.com/xqhare/nomos) project management system.
+`Aequa` uses my [nomos](https://github.com/xqhare/nomos) project management system.
 
 The roadmap for this project can be found in the [nomos.md](nomos.md) file.
 
