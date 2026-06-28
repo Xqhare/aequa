@@ -177,6 +177,30 @@ impl Number {
 //                     From implementations
 // -----------------------------------------------------------
 
+impl TryFrom<&str> for Number {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        if let Ok(i) = value.parse::<usize>() {
+            return Ok(Number::Unsigned(i));
+        } else if let Ok(i) = value.parse::<isize>() {
+            return Ok(Number::Integer(i));
+        } else if let Ok(f) = value.parse::<f64>() {
+            return Ok(Number::Float(f));
+        }
+
+        Err(())
+    }
+}
+
+impl TryFrom<String> for Number {
+    type Error = ();
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        value.as_str().try_into()
+    }
+}
+
 impl From<usize> for Number {
     fn from(c: usize) -> Self {
         Number::Unsigned(c)
