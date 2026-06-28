@@ -185,6 +185,48 @@ impl Default for XffValue {
     }
 }
 
+// ----------------------------------------------------------
+// Macros
+// ----------------------------------------------------------
+
+#[macro_export]
+/// Macro to convert any value into a `XffValue`
+///
+/// ## Example
+/// ```rust
+/// use nabu::{XffValue, xff};
+/// let value_int = xff!(42);
+/// let value_string = xff!("hello mom");
+/// let value_float = xff!(42.0);
+/// let value_vec = xff!(vec![42]);
+///
+/// assert_eq!(value_int, XffValue::from(42));
+/// assert_eq!(value_string, XffValue::from("hello mom"));
+/// assert_eq!(value_float, XffValue::from(42.0));
+/// assert_eq!(value_vec, XffValue::from(vec![42]));
+/// ```
+macro_rules! xff {
+    ($value: expr) => {
+        XffValue::from($value)
+    };
+}
+
+#[macro_export]
+/// Macro to convert any Vector into a `Vec<XffValue>`
+///
+/// ## Example
+/// ```rust
+/// use nabu::{XffValue, tvec_to_xff_value};
+/// let vec = tvec_to_xff_value!(u8; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+/// let vec2 = tvec_to_xff_value!(i8; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+/// let ary: Vec<u8> = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+/// assert_eq!(vec, XffValue::from(ary.clone()));
+/// assert_ne!(vec2, XffValue::from(ary));
+/// ```
+macro_rules! tvec_to_xff_value {
+    ($t:ty; $($e:expr),*) => { XffValue::from(vec![$($e as $t),*] as Vec<$t>)};
+}
+
 // -----------------------------------------------------------
 //                     General implementations
 // -----------------------------------------------------------
@@ -1735,7 +1777,11 @@ impl std::fmt::Display for XffValue {
                 write!(f, "}}")
             }
             XffValue::Table(t) => write!(f, "{t}"),
-            XffValue::Graph(g) => write!(f, "(graph with {} nodes)", g.get_all_nodes_indices().count()),
+            XffValue::Graph(g) => write!(
+                f,
+                "(graph with {} nodes)",
+                g.get_all_nodes_indices().count()
+            ),
             XffValue::Metadata(m) => write!(f, "{m}"),
             XffValue::Data(d) => write!(f, "{d}"),
             XffValue::Boolean(b) => write!(f, "{b}"),
