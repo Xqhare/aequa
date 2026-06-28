@@ -160,9 +160,9 @@ pub enum XffValue {
     /// Not a Number (IEEE 754)
     NaN,
     /// Positive NaN (IEEE 754)
-    PNan,
+    PosNan,
     /// Negative NaN (IEEE 754)
-    NNan,
+    NegNaN,
     /// Positive Infinity (IEEE 754)
     Infinity,
     /// Negative Infinity (IEEE 754)
