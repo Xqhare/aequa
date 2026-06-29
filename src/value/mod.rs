@@ -160,7 +160,7 @@ pub enum XffValue {
     /// Not a Number (IEEE 754)
     NaN,
     /// Positive NaN (IEEE 754)
-    PosNan,
+    PosNaN,
     /// Negative NaN (IEEE 754)
     NegNaN,
     /// Positive Infinity (IEEE 754)
@@ -194,7 +194,7 @@ impl Default for XffValue {
 ///
 /// ## Example
 /// ```rust
-/// use nabu::{XffValue, xff};
+/// use aequa::{XffValue, xff};
 /// let value_int = xff!(42);
 /// let value_string = xff!("hello mom");
 /// let value_float = xff!(42.0);
@@ -216,7 +216,7 @@ macro_rules! xff {
 ///
 /// ## Example
 /// ```rust
-/// use nabu::{XffValue, tvec_to_xff_value};
+/// use aequa::{XffValue, tvec_to_xff_value};
 /// let vec = tvec_to_xff_value!(u8; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 /// let vec2 = tvec_to_xff_value!(i8; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 /// let ary: Vec<u8> = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -1049,13 +1049,13 @@ impl XffValue {
     /// Checks if the value is Positive NaN
     #[must_use]
     pub fn is_pnan(&self) -> bool {
-        matches!(self, XffValue::PNan)
+        matches!(self, XffValue::PosNaN)
     }
 
     /// Checks if the value is Negative NaN
     #[must_use]
     pub fn is_nnan(&self) -> bool {
-        matches!(self, XffValue::NNan)
+        matches!(self, XffValue::NegNaN)
     }
 
     /// Returns the value as a reference to a naive date
@@ -1792,8 +1792,8 @@ impl std::fmt::Display for XffValue {
             XffValue::LocalDateTime(ldt) => write!(f, "{ldt}"),
             XffValue::Uuid(u) => write!(f, "{u}"),
             XffValue::NaN => write!(f, "NaN"),
-            XffValue::PNan => write!(f, "+NaN"),
-            XffValue::NNan => write!(f, "-NaN"),
+            XffValue::PosNaN => write!(f, "+NaN"),
+            XffValue::NegNaN => write!(f, "-NaN"),
             XffValue::Infinity => write!(f, "Infinity"),
             XffValue::NegInfinity => write!(f, "NegInfinity"),
             XffValue::Null => write!(f, "Null"),

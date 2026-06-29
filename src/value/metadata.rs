@@ -75,7 +75,10 @@ impl Metadata {
     /// meta.set_created_at(1647081600000);
     /// ```
     pub fn set_created_at(&mut self, timestamp: u64) {
-        self.map.insert("created_at", XffValue::from_unix_timestamp_millis(timestamp));
+        self.map.insert(
+            "created_at",
+            XffValue::from_unix_timestamp_millis(timestamp),
+        );
     }
 
     /// Gets the creation timestamp
@@ -242,8 +245,8 @@ impl Metadata {
             | XffValue::Uuid(_)
             | XffValue::Data(_)
             | XffValue::NaN
-            | XffValue::PNan
-            | XffValue::NNan
+            | XffValue::PosNaN
+            | XffValue::NegNaN
             | XffValue::Infinity
             | XffValue::NegInfinity
             | XffValue::Null => true,
