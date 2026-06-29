@@ -1551,6 +1551,12 @@ impl From<LocalDateTime> for XffValue {
     }
 }
 
+impl From<Number> for XffValue {
+    fn from(c: Number) -> Self {
+        XffValue::Number(c)
+    }
+}
+
 impl From<crate::hp_float::HpFloat> for XffValue {
     fn from(c: crate::hp_float::HpFloat) -> Self {
         XffValue::HpFloat(c)
