@@ -5,5 +5,5 @@
     - [ ] Advanced Math :: Does it support trigonometric functions, powers, or roots, or is it strictly for basic arithmetic?
 - [ ] Graph Error :: needs to be reworked with nemesis
     * Or reworked to return `None` like any other XffValue
-- [ ] (Z) No SERDE support :: Add support for SERDE as its own feature
+- [ ] (9) No SERDE support :: Add support for SERDE as its own feature
     * This will require a external dependency (serde); But thats how the cookie crumbles sometimes
