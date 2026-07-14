@@ -7,3 +7,7 @@
     * Or reworked to return `None` like any other XffValue
 - [ ] (9) No SERDE support :: Add support for SERDE as its own feature
     * This will require a external dependency (serde); But thats how the cookie crumbles sometimes
+- [ ] (1) Ensure API completeness :: Numbers only have a `into_*` function, but no `as_*` or `as_…_mut` functions
+    * Also check every other type. All need a `into_*`, `as_*`, and `as_…_mut` function.
+    - [ ] Check Upcasting :: All types should be able to be thrown into either `XffValue::from` or `xff!()` E.g. `xff!(Object)`, `XffValue::from(Object)`
+        * That should be easily checked with a large test covering all variants
