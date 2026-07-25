@@ -152,6 +152,19 @@ impl HpFloat {
     pub fn get_scale(&self) -> u32 {
         self.scale
     }
+
+    /// Creates a new `HpFloat` with the given value and scale
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::from_scale_and_value(2, 123);
+    /// assert_eq!(float.to_string(), "1.23");
+    /// ```
+    #[must_use]
+    pub fn from_scale_and_value(scale: u32, value: i128) -> Self {
+        Self { value, scale }
+    }
 }
 
 impl From<std::primitive::f64> for HpFloat {
