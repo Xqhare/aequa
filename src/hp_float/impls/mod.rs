@@ -81,7 +81,7 @@ pub mod maths;
 ///
 /// 1. Pad the string with leading zeros: "03"
 /// 2. Insert the decimal point: "0.3"
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct HpFloat {
     /// The integer representation of the number (e.g., 1204 for 1.204)
     value: i128,
