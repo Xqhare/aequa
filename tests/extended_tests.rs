@@ -16,7 +16,7 @@ fn logic_float() {
 
     // Test 3: High Precision String (Bypass f64 16-digit limit)
     // 30 decimal places
-    let hp_str = "0.123456789012345678901234567890";
+    let hp_str = "0.123456789012345678901234567891";
     let hp: f64 = hp_str.parse().unwrap();
     println!("High Precision String (30 digits): {:?}", hp);
     assert_eq!(hp.get_scale(), 30);

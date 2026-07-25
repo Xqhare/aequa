@@ -81,14 +81,55 @@ pub mod maths;
 ///
 /// 1. Pad the string with leading zeros: "03"
 /// 2. Insert the decimal point: "0.3"
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy)]
 pub struct HpFloat {
     /// The integer representation of the number (e.g., 1204 for 1.204)
     value: i128,
     /// The power of 10 applied to the value (e.g., 3 for 10^-3)
     scale: u32,
 }
+impl Ord for HpFloat {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        if self.scale == other.scale {
+            self.value.cmp(&other.value)
+        } else if self.scale > other.scale {
+            let diff = self.scale - other.scale;
+            let adjusted_rhs = other.value.saturating_mul(10i128.pow(diff));
+            self.value.cmp(&adjusted_rhs)
+        } else {
+            let diff = other.scale - self.scale;
+            let adjusted_lhs = self.value.saturating_mul(10i128.pow(diff));
+            adjusted_lhs.cmp(&other.value)
+        }
+    }
+}
 
+impl PartialOrd for HpFloat {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for HpFloat {
+    fn eq(&self, other: &Self) -> bool {
+        // Fast path for canonicalized floats with matching scales
+        if self.scale == other.scale {
+            self.value == other.value
+        } else {
+            self.cmp(other).is_eq()
+        }
+    }
+}
+
+impl Eq for HpFloat {}
+
+impl std::hash::Hash for HpFloat {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        // Since floats are always canonicalized, hash raw fields directly in O(1)
+        self.value.hash(state);
+        self.scale.hash(state);
+    }
+}
 impl HpFloat {
     /// Creates a new `HpFloat` with the given value and scale
     ///
@@ -100,7 +141,16 @@ impl HpFloat {
     /// ```
     #[must_use]
     pub const fn new(value: i128, scale: u32) -> Self {
-        Self { value, scale }
+        let mut s = Self { value, scale };
+        if s.value == 0 {
+            s.scale = 0;
+            return s;
+        }
+        while s.scale > 0 && s.value % 10 == 0 {
+            s.value /= 10;
+            s.scale -= 1;
+        }
+        s
     }
 
     /// Trims trailing zeros from the decimal part to simplify the scale.
@@ -151,19 +201,6 @@ impl HpFloat {
     #[must_use]
     pub fn get_scale(&self) -> u32 {
         self.scale
-    }
-
-    /// Creates a new `HpFloat` with the given value and scale
-    ///
-    /// # Example
-    /// ```rust
-    /// use aequa::hp_float::HpFloat;
-    /// let float = HpFloat::from_scale_and_value(2, 123);
-    /// assert_eq!(float.to_string(), "1.23");
-    /// ```
-    #[must_use]
-    pub fn from_scale_and_value(scale: u32, value: i128) -> Self {
-        Self { value, scale }
     }
 }
 
