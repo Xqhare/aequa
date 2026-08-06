@@ -86,6 +86,10 @@ pub struct HpFloat {
     /// The integer representation of the number (e.g., 1204 for 1.204)
     value: i128,
     /// The power of 10 applied to the value (e.g., 3 for 10^-3)
+    ///
+    /// # Note
+    /// Limited to a `u32` to avoid overflow when multiplying by `i128.pow(scale)`
+    /// 10^±4_294_967_295 should really be enough for anyone
     scale: u32,
 }
 impl Ord for HpFloat {
@@ -94,11 +98,11 @@ impl Ord for HpFloat {
             self.value.cmp(&other.value)
         } else if self.scale > other.scale {
             let diff = self.scale - other.scale;
-            let adjusted_rhs = other.value.saturating_mul(10i128.pow(diff));
+            let adjusted_rhs = other.value.saturating_mul(10i128.saturating_pow(diff));
             self.value.cmp(&adjusted_rhs)
         } else {
             let diff = other.scale - self.scale;
-            let adjusted_lhs = self.value.saturating_mul(10i128.pow(diff));
+            let adjusted_lhs = self.value.saturating_mul(10i128.saturating_pow(diff));
             adjusted_lhs.cmp(&other.value)
         }
     }
@@ -147,8 +151,8 @@ impl HpFloat {
             return s;
         }
         while s.scale > 0 && s.value % 10 == 0 {
-            s.value /= 10;
-            s.scale -= 1;
+            s.value = s.value.saturating_div(10);
+            s.scale = s.scale.saturating_sub(1);
         }
         s
     }
@@ -165,8 +169,8 @@ impl HpFloat {
     #[must_use]
     pub fn trim_scale(mut self) -> Self {
         while self.scale > 0 && self.value % 10 == 0 {
-            self.value /= 10;
-            self.scale -= 1;
+            self.value = self.value.saturating_div(10);
+            self.scale = self.scale.saturating_sub(1);
         }
         self
     }
