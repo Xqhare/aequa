@@ -217,9 +217,21 @@ impl From<std::primitive::f64> for HpFloat {
     }
 }
 
+impl Into<std::primitive::f64> for HpFloat {
+    fn into(self) -> std::primitive::f64 {
+        self.value as f64 * 10f64.powi(-(self.scale as i32))
+    }
+}
+
 impl From<std::primitive::f32> for HpFloat {
     fn from(f: std::primitive::f32) -> Self {
         f.to_string().parse().unwrap_or(Self::new(0, 0))
+    }
+}
+
+impl Into<std::primitive::f32> for HpFloat {
+    fn into(self) -> std::primitive::f32 {
+        self.value as f32 * 10f32.powi(-(self.scale as i32))
     }
 }
 
@@ -268,4 +280,16 @@ impl Display for HpFloat {
             write!(f, "{}0.{}{}", sign, "0".repeat(padding), s)
         }
     }
+}
+
+#[test]
+fn simple_casting() {
+    let f = HpFloat::new(123, 2);
+    assert_eq!(Into::<f64>::into(f), 1.23);
+    let f2 = HpFloat::from(1.23);
+    assert_eq!(Into::<f64>::into(f2), 1.23);
+    let f3: HpFloat = 3.14.into();
+    assert_eq!(Into::<f64>::into(f3), 3.14);
+    let f4 = HpFloat::from(42.000014);
+    assert_eq!(Into::<f32>::into(f4), 42.000014);
 }
