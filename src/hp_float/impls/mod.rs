@@ -158,6 +158,31 @@ impl HpFloat {
         s
     }
 
+    /// Returns true if the value is positive
+    pub fn is_positive(&self) -> bool {
+        self.value > 0
+    }
+
+    /// Returns true if the value is negative
+    pub fn is_negative(&self) -> bool {
+        self.value < 0
+    }
+
+    /// Returns true if the value is zero
+    pub fn is_zero(&self) -> bool {
+        self.value == 0
+    }
+
+    /// Returns true if the value is one
+    pub fn is_one(&self) -> bool {
+        self.value == 1 && self.scale == 0
+    }
+
+    /// Returns true if the value is between two other values
+    pub fn is_between(&self, min: &Self, max: &Self) -> bool {
+        self >= min && self <= max
+    }
+
     /// Creates a new `HpFloat` with a value of 0.0
     pub fn new_zero() -> Self {
         Self::new(0, 0)
