@@ -1,4 +1,4 @@
-use aequa::f64;
+use aequa::hp_float::f64;
 
 fn main() {
     // Standard floats have precision issues with 0.1 and 0.2

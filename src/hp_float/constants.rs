@@ -14,7 +14,3 @@ pub const MAX: HpFloat = HpFloat::new(i128::MAX, 0);
 
 /// The minimum value of an i128 representing an Aequa with scale 0.
 pub const MIN: HpFloat = HpFloat::new(i128::MIN, 0);
-
-// For INFINITY and NAN, we currently don't have a special state.
-// We should implement an enum or special scale in the future.
-// For now, these are not truly represented.

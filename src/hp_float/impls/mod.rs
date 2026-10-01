@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use crate::hp_float::{E, MAX, MIN, PI, TAU};
+
 pub mod maths;
 /// A number with arbitrary precision.
 ///
@@ -129,7 +131,6 @@ impl Eq for HpFloat {}
 
 impl std::hash::Hash for HpFloat {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        // Since floats are always canonicalized, hash raw fields directly in O(1)
         self.value.hash(state);
         self.scale.hash(state);
     }
@@ -155,6 +156,36 @@ impl HpFloat {
             s.scale = s.scale.saturating_sub(1);
         }
         s
+    }
+
+    /// Creates a new `HpFloat` with a value of 0.0
+    pub fn new_zero() -> Self {
+        Self::new(0, 0)
+    }
+
+    /// Creates a new `HpFloat` with the minimum representable value
+    pub fn new_min() -> Self {
+        MIN
+    }
+
+    /// Creates a new `HpFloat` with the maximum representable value
+    pub fn new_max() -> Self {
+        MAX
+    }
+
+    /// Creates a new `HpFloat` with the value of pi; 32 digits of precision
+    pub fn new_pi() -> Self {
+        PI
+    }
+
+    /// Creates a new `HpFloat` with the value of Euler's number; 32 digits of precision
+    pub fn new_e() -> Self {
+        E
+    }
+
+    /// Creates a new `HpFloat` with the value of tau; 32 digits of precision
+    pub fn new_tau() -> Self {
+        TAU
     }
 
     /// Trims trailing zeros from the decimal part to simplify the scale.
