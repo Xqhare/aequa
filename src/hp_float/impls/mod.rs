@@ -32,7 +32,7 @@ pub mod maths;
 /// Simply shadow the primitive type to use `Aequa` throughout your module with full precision.
 ///
 /// ```rust
-/// use aequa::f64; // Shadows primitive f64 locally
+/// use aequa::hp_float::f64; // Shadows primitive f64 locally
 ///
 /// let a: f64 = 0.1.into();
 /// let b: f64 = 0.2.into();
