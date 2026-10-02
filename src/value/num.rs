@@ -1,3 +1,5 @@
+use crate::hp_float::HpFloat;
+
 #[derive(Debug, Clone, PartialEq, Copy, PartialOrd)]
 /// A numeric value.
 ///
@@ -40,6 +42,44 @@ pub enum Number {
 // -----------------------------------------------------------
 
 impl Number {
+    /// Returns the value as a `HpFloat`
+    ///
+    /// # Panics
+    /// `HpFloat`'s value is an `i128`, `Number::Integer`'s value is an `isize` and `Number::Unsigned`'s value is an `usize`.
+    /// These two types are not guaranteed to fit in an `i128`.
+    ///
+    /// `HpFloat` cannot represent `NaN` or `Infinity`.
+    ///
+    /// # Note
+    /// Casting a `Number::Float` to a `HpFloat` is lossless.
+    /// However, any inaccuracies because of IEEE-754 will also be kept.
+    pub fn into_hp_float(self) -> HpFloat {
+        match self {
+            Number::Float(f) => f.into(),
+            Number::Integer(i) => HpFloat::new(i.try_into().expect("integer overflow"), 0),
+            Number::Unsigned(u) => HpFloat::new(u.try_into().expect("integer overflow"), 0),
+        }
+    }
+    /// Returns the value as a `HpFloat`
+    ///
+    /// # Panics
+    /// `HpFloat`'s value is an `i128`, `Number::Integer`'s value is an `isize` and `Number::Unsigned`'s value is an `usize`.
+    /// These two types are not guaranteed to fit in an `i128`.
+    ///
+    /// `HpFloat` cannot represent `NaN` or `Infinity`.
+    ///
+    /// # Note
+    /// Casting a `Number::Float` to a `HpFloat` is lossless.
+    /// However, any inaccuracies because of IEEE-754 will also be kept.
+    ///
+    /// # Returns
+    /// The value as a `HpFloat`.
+    ///
+    /// It is owned, in contrast to all other 'as_' functions because of the need to cast the
+    /// values into an `HpFloat`.
+    pub fn as_hp_float(&self) -> HpFloat {
+        self.into_hp_float()
+    }
     /// Returns the value as an unsigned integer if it is a `Number::Unsigned`
     /// Returns `None` for all other variants
     ///

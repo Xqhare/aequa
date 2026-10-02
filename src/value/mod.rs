@@ -992,11 +992,16 @@ impl XffValue {
         }
     }
 
-    /// Returns the value as an HpFloat if it is a `XffValue::HpFloat`
+    /// Returns the value as a HpFloat if it is a `XffValue::HpFloat` or `XffValue::Number`
+    ///
+    /// If the value is a `XffValue::Number`, the value is converted to a `XffValue::HpFloat`.
+    /// This operation can seldom panic: IEEE 754 NaN's, Inf's as well as any isize or usize
+    /// value unrepresentable as an i128 will panic.
     #[must_use]
     pub fn into_hp_float(&self) -> Option<crate::hp_float::HpFloat> {
         match self {
             XffValue::HpFloat(f) => Some(f.clone()),
+            XffValue::Number(n) => Some(n.into_hp_float()),
             _ => None,
         }
     }
@@ -1094,7 +1099,9 @@ impl XffValue {
         }
     }
 
-    /// Returns the value as a reference to an HpFloat
+    // TODO: When stabilising XffValue::HpFloat, expanding this to also cover all other
+    // `XffValue::Numbers` should be possible.
+    /// Returns the value as a reference to a HpFloat
     #[must_use]
     pub fn as_hp_float(&self) -> Option<&crate::hp_float::HpFloat> {
         match self {
