@@ -11,3 +11,4 @@
     * Also check every other type. All need a `into_*`, `as_*`, and `as_…_mut` function.
     - [ ] Check Upcasting :: All types should be able to be thrown into either `XffValue::from` or `xff!()` E.g. `xff!(Object)`, `XffValue::from(Object)`
         * That should be easily checked with a large test covering all variants
+- [ ] (2) Number casting :: Numbers only support basic `into_…` atm, and no `as_…` at all.
