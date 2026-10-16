@@ -4,7 +4,7 @@ use std::{
     ops::Index,
 };
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq)]
 /// An object made up of key-value pairs of XFF values with string key with string keys.
 ///
 /// Can be crated with `Object::from()` or `Object::new()`.
@@ -90,7 +90,7 @@ use std::{
 /// ```
 pub struct Object {
     /// An object of XFF values and string keys
-    pub map: BTreeMap<String, XffValue>,
+    pub map: HashMap<String, XffValue>,
 }
 
 // -----------------------------------------------------------
@@ -107,9 +107,8 @@ impl Object {
     /// ```
     #[must_use]
     pub fn new() -> Self {
-
         Object {
-            map: BTreeMap::new(),
+            map: HashMap::new(),
         }
     }
 
@@ -131,7 +130,7 @@ impl Object {
     /// ```
     #[must_use]
     pub fn into_btree_map(self) -> BTreeMap<String, XffValue> {
-        self.map
+        self.map.into_iter().collect::<BTreeMap<String, XffValue>>()
     }
 
     /// Convert the object into a `HashMap`.\
@@ -153,7 +152,7 @@ impl Object {
     /// ```
     #[must_use]
     pub fn into_hash_map(self) -> HashMap<String, XffValue> {
-        self.map.into_iter().collect::<HashMap<String, XffValue>>()
+        self.map
     }
 
     /// Returns `true` if the object is empty
@@ -322,19 +321,19 @@ impl Object {
     ///     println!("{}: {}", key, value);
     /// }
     /// ```
-    pub fn iter(&self) -> std::collections::btree_map::Iter<'_, String, XffValue> {
+    pub fn iter(&self) -> std::collections::hash_map::Iter<'_, String, XffValue> {
         self.map.iter()
     }
 
     /// Returns a mutable key-value pair iterator of the object
-    pub fn iter_mut(&mut self) -> std::collections::btree_map::IterMut<'_, String, XffValue> {
+    pub fn iter_mut(&mut self) -> std::collections::hash_map::IterMut<'_, String, XffValue> {
         self.map.iter_mut()
     }
 }
 
 impl IntoIterator for Object {
     type Item = (String, XffValue);
-    type IntoIter = std::collections::btree_map::IntoIter<String, XffValue>;
+    type IntoIter = std::collections::hash_map::IntoIter<String, XffValue>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.map.into_iter()
@@ -343,7 +342,7 @@ impl IntoIterator for Object {
 
 impl<'a> IntoIterator for &'a Object {
     type Item = (&'a String, &'a XffValue);
-    type IntoIter = std::collections::btree_map::Iter<'a, String, XffValue>;
+    type IntoIter = std::collections::hash_map::Iter<'a, String, XffValue>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.map.iter()
@@ -352,7 +351,7 @@ impl<'a> IntoIterator for &'a Object {
 
 impl<'a> IntoIterator for &'a mut Object {
     type Item = (&'a String, &'a mut XffValue);
-    type IntoIter = std::collections::btree_map::IterMut<'a, String, XffValue>;
+    type IntoIter = std::collections::hash_map::IterMut<'a, String, XffValue>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.map.iter_mut()
@@ -391,7 +390,7 @@ where
     V: Into<XffValue>,
 {
     fn from(map: HashMap<S, V>) -> Self {
-        let mut out: BTreeMap<String, XffValue> = BTreeMap::new();
+        let mut out: HashMap<String, XffValue> = HashMap::new();
         for (k, v) in map {
             out.insert(k.into(), v.into());
         }
@@ -405,7 +404,7 @@ where
     V: Into<XffValue>,
 {
     fn from(map: BTreeMap<S, V>) -> Self {
-        let mut out: BTreeMap<String, XffValue> = BTreeMap::new();
+        let mut out: HashMap<String, XffValue> = HashMap::new();
         for (k, v) in map {
             out.insert(k.into(), v.into());
         }
@@ -442,5 +441,26 @@ impl std::fmt::Display for Object {
             write!(f, "{key}: {value}")?;
         }
         write!(f, "}}")
+    }
+}
+
+// -----------------------------------------------------------
+//                     PartialOrg implementation
+// -----------------------------------------------------------
+
+impl PartialOrd for Object {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self.map.len() != other.map.len() {
+            return None;
+        }
+        for (key, value) in self.map.iter() {
+            if !other.map.contains_key(key) {
+                return None;
+            }
+            if value != other.map.get(key).unwrap() {
+                return None;
+            }
+        }
+        Some(std::cmp::Ordering::Equal)
     }
 }
