@@ -1,6 +1,9 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
-use crate::hp_float::{E, MAX, MIN, PI, TAU};
+use crate::{
+    XffValue,
+    hp_float::{E, MAX, MIN, PI, TAU},
+};
 
 pub mod maths;
 /// A number with arbitrary precision.
@@ -231,9 +234,44 @@ impl HpFloat {
         self
     }
 
+    /// Returns the integer part of the number
+    ///
+    /// Use [`get_decimal_part()`](HpFloat::get_decimal_part) to get the decimal part
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::new(1234, 2);
+    /// assert_eq!(float.get_integer_part(), 12);
+    /// ```
+    #[must_use]
+    pub fn get_integer_part(&self) -> i128 {
+        self.value / 10i128.saturating_pow(self.scale)
+    }
+
+    /// Returns the decimal part of the number
+    ///
+    /// Use [`get_integer_part()`](HpFloat::get_integer_part) to get the integer part
+    ///
+    /// # Note
+    /// Trailing zeros are removed
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::new(1234, 2);
+    /// assert_eq!(float.get_decimal_part(), 34);
+    /// let float2 = HpFloat::new(1230, 2);
+    /// assert_eq!(float2.get_decimal_part(), 3);
+    /// ```
+    #[must_use]
+    pub fn get_decimal_part(&self) -> i128 {
+        self.value % 10i128.saturating_pow(self.scale)
+    }
+
     /// Returns the value of the number
     ///
-    /// Usefull for custom serialization
+    /// Useful for custom serialization
     /// Use `get_scale()` to get the scale
     ///
     /// # Example
@@ -249,7 +287,7 @@ impl HpFloat {
 
     /// Returns the scale of the number
     ///
-    /// Usefull for custom serialization
+    /// Useful for custom serialization
     /// Use `get_value()` to get the value
     ///
     /// # Example
@@ -261,6 +299,27 @@ impl HpFloat {
     #[must_use]
     pub fn get_scale(&self) -> u32 {
         self.scale
+    }
+
+    /// Creates a new `HpFloat` with the given value and scale
+    ///
+    /// Useful for custom deserialization.
+    /// Use [`get_value()`](HpFloat::get_value) and [`get_scale()`](HpFloat::get_scale) to get the
+    /// value and scale for serialization
+    ///
+    /// # Arguments
+    /// * `value` - The value of the number
+    /// * `scale` - The scale of the number
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::from_value_scale(123, 2);
+    /// assert_eq!(float.to_string(), "1.23");
+    /// ```
+    #[must_use]
+    pub fn from_value_scale(value: i128, scale: u32) -> Self {
+        Self::new(value, scale)
     }
 }
 
@@ -348,4 +407,16 @@ fn simple_casting() {
     assert_eq!(Into::<f64>::into(f3), 3.14);
     let f4 = HpFloat::from(42.000014);
     assert_eq!(Into::<f32>::into(f4), 42.000014);
+}
+
+#[test]
+fn get_parts() {
+    for n in 1..=50_000 {
+        let num = format!("{}.{}", n, n);
+        let float = HpFloat::from_str(&num).unwrap();
+        let int = float.get_integer_part();
+        let dec = float.get_decimal_part();
+        assert_eq!(int, n);
+        assert_eq!(dec.to_string(), format!("{}", n).trim_end_matches('0'));
+    }
 }
