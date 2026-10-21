@@ -1,9 +1,6 @@
-use std::{fmt::Display, str::FromStr};
+use std::fmt::Display;
 
-use crate::{
-    XffValue,
-    hp_float::{E, MAX, MIN, PI, TAU},
-};
+use crate::hp_float::{E, MAX, MIN, PI, TAU};
 
 pub mod maths;
 /// A number with arbitrary precision.
@@ -18,6 +15,7 @@ pub mod maths;
 /// - Fast
 /// - No dependencies
 /// - Drop-in replacement for `f64` and `f32`
+/// - Implements `Eq`, `Ord` and `Hash` in contrast to the float primitives
 ///
 /// ## Usage
 ///
@@ -138,6 +136,13 @@ impl std::hash::Hash for HpFloat {
         self.scale.hash(state);
     }
 }
+
+impl Default for HpFloat {
+    fn default() -> Self {
+        Self::new(0, 0)
+    }
+}
+
 impl HpFloat {
     /// Creates a new `HpFloat` with the given value and scale
     ///
@@ -411,6 +416,7 @@ fn simple_casting() {
 
 #[test]
 fn get_parts() {
+    use std::str::FromStr;
     for n in 1..=50_000 {
         let num = format!("{}.{}", n, n);
         let float = HpFloat::from_str(&num).unwrap();
