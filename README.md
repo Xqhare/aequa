@@ -52,6 +52,10 @@ All nomos files follow the syntax defined [here](https://github.com/Xqhare/nomos
 - **No Breaking Changes**: Absolutely no breaking changes to the API. Ever.
 - **XFF Support**: Is fully compatible with all versions of the `XFF` specification.
 
+#### `XffSerde` Trait
+
+The `XffSerde` trait provides a unified way to serialize and deserialize any struct implementing it to/from a `XffValue`.
+
 ### 2. High-Precision Arithmetic (`HpFloat`)
 
 `HpFloat` is a decimal-based arbitrary precision type that avoids the pitfalls of IEEE 754 floating-point math (e.g., `0.1 + 0.2` is exactly `0.3`).
