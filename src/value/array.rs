@@ -80,6 +80,20 @@ impl Array {
         Array { values: Vec::new() }
     }
 
+    /// Creates a new `Array` with a given capacity
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Array;
+    /// let array = Array::with_capacity(10);
+    /// ```
+    #[must_use]
+    pub fn with_capacity(capacity: usize) -> Self {
+        Array {
+            values: Vec::with_capacity(capacity),
+        }
+    }
+
     /// Returns the `Array` as a vector
     ///
     /// # Example
