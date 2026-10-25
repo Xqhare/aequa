@@ -103,6 +103,38 @@ impl Data {
     pub fn into_vec(self) -> Vec<u8> {
         self.data
     }
+
+    /// Returns a reference to the data as a vector of bytes
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Data;
+    ///
+    /// let data = Data::from(vec![1, 2, 3, 4, 5]);
+    ///
+    /// let vector = data.as_vec();
+    /// assert_eq!(vector, vec![1, 2, 3, 4, 5]);
+    /// ```
+    #[must_use]
+    pub fn as_vec(&self) -> &Vec<u8> {
+        &self.data
+    }
+
+    /// Returns a reference to the data as a slice of bytes
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::Data;
+    ///
+    /// let data = Data::from(vec![1, 2, 3, 4, 5]);
+    ///
+    /// let slice = data.as_slice();
+    /// assert_eq!(slice, &[1, 2, 3, 4, 5]);
+    /// ```
+    #[must_use]
+    pub fn as_slice(&self) -> &[u8] {
+        &self.data
+    }
 }
 
 // -----------------------------------------------------------
