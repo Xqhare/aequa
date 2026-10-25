@@ -113,7 +113,7 @@ impl Data {
     /// let data = Data::from(vec![1, 2, 3, 4, 5]);
     ///
     /// let vector = data.as_vec();
-    /// assert_eq!(vector, vec![1, 2, 3, 4, 5]);
+    /// assert_eq!(vector, &vec![1, 2, 3, 4, 5]);
     /// ```
     #[must_use]
     pub fn as_vec(&self) -> &Vec<u8> {
