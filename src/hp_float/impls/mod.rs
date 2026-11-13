@@ -1,5 +1,10 @@
 use std::fmt::Display;
 
+use std::{
+    fmt::Debug,
+    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Not, Shl, Shr, Sub},
+};
+
 use crate::hp_float::{E, MAX, MIN, PI, TAU};
 
 pub mod maths;
@@ -144,6 +149,42 @@ impl Default for HpFloat {
 }
 
 impl HpFloat {
+    /// Cast any integer into an `HpFloat`.
+    ///
+    /// # Note
+    ///
+    /// `isize` & `usize` do not implement `Into::<i128>` and cannot be used.
+    ///
+    /// # Example
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let float = HpFloat::cast(123u8);
+    /// assert_eq!(float.to_string(), "123");
+    /// let float = HpFloat::cast(123u64);
+    /// assert_eq!(float.to_string(), "123");
+    /// let float = HpFloat::cast(-123i8);
+    /// assert_eq!(float.to_string(), "-123");
+    /// let float = HpFloat::cast(-123i64);
+    /// assert_eq!(float.to_string(), "-123");
+    /// ```
+    #[must_use]
+    pub fn cast<N: Into<i128>>(number: N) -> Self {
+        Self::new(number.into(), 0)
+    }
+    /// Create a new `HpFloat` from a `i128`.
+    ///
+    /// Convenience function for:
+    /// ```rust
+    /// use aequa::hp_float::HpFloat;
+    /// let int: i128 = -2;
+    /// let float = HpFloat::new(int, 0);
+    /// let float2 = HpFloat::new_from_int(int);
+    /// assert_eq!(float, float2);
+    /// ```
+    #[must_use]
+    pub const fn new_from_int(int: i128) -> Self {
+        Self::new(int, 0)
+    }
     /// Creates a new `HpFloat` with the given value and scale
     ///
     /// # Example
