@@ -1,9 +1,6 @@
 use std::fmt::Display;
 
-use std::{
-    fmt::Debug,
-    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Not, Shl, Shr, Sub},
-};
+use std::fmt::Debug;
 
 use crate::hp_float::{E, MAX, MIN, PI, TAU};
 
